@@ -11,10 +11,6 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="status">Status</label>
-        <input type="text" class="form-control" name="status">
-    </div>
-    <div class="form-group">
         <label for="image">Image</label>
         <input type="file" name="image">
     </div>

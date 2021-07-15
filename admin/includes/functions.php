@@ -217,22 +217,19 @@ function delPost($post) {
 function addPost($post, $files) {
     if(isset($post["add_post"])) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            openConn();
-            global $conn;
             $title = $post["title"];
             $category = $post["category"];
             $author = $_SESSION["username"];
-            $status = $post["status"];
             $tags = $post["tags"];
             $content = $post["content"];
-
+            
             // Photo Upload System
-        
+            
             $target_dir = $_SERVER['DOCUMENT_ROOT']."/cms/uploads/";
             $target_file = $target_dir.basename($files["image"]["name"]);
             $uploadOk = 0;
             $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
+            
             if (!empty($files["image"]["name"])) {
                 $checkPhoto = getimagesize($files["image"]["tmp_name"]);
                 if ($checkPhoto !== false) {
@@ -240,13 +237,12 @@ function addPost($post, $files) {
                         if ($fileType == "jpg" || $fileType == "jpeg" || $fileType == "png") {
                             if (!file_exists($target_file)) {
                                 if (move_uploaded_file($files["image"]["tmp_name"], $target_file)) {
-                                $image = basename($files["image"]["name"]);
+                                    $image = basename($files["image"]["name"]);
                                 } else {
-                                $photoError = "Sorry, there was an error uploading your file.";
+                                    $photoError = "Sorry, there was an error uploading your file.";
                                 }
                             } else {
                                 $photoError = "Sorry, file already exists.";
-                                echo $photoError;
                             }
                         } else {
                             $photoError = "Sorry, only JPG, JPEG & PNG files are allowed.";
@@ -254,21 +250,25 @@ function addPost($post, $files) {
                     } else {
                         $photoError = "Sorry, your file is too large.";
                     }
-                    $uploadOk = 1;
                 } else {
                     $photoError = "File is not an image.";
                 }
             }
-
+            
             if(!isset($photoError)) {
                 if(!isset($image)) {
                     $image = "no-photo.png";
                 }
-                $query = "INSERT INTO posts(post_title, post_author, post_category_id, post_status, post_image, post_tags, post_comment_count, post_content) ";
-                $query .= "VALUES('$title', '$author', '$category', '$status', '$image', '$tags', '4', '$content')";
+                openConn();
+                global $conn;
+                $query = "INSERT INTO posts(post_title, post_author, post_category_id, post_image, post_tags, post_comment_count, post_content) ";
+                $query .= "VALUES('$title', '$author', '$category', '$image', '$tags', '4', '$content')";
                 $conn->exec($query);
                 echo "<h3 style='color: green;'>Post was published succesfully!</h3>";
                 return $conn = 0;
+            } else {
+                $alert = "<p style='color: red;'>".$photoError."</p>";
+                echo $alert;
             }
         }
     }
@@ -281,7 +281,6 @@ function editPost($post, $files, $id) {
             global $conn;
             $title = $post["title"];
             $category = $post["category"];
-            $status = $post["status"];
             $tags = $post["tags"];
             $content = $post["content"];
 
@@ -289,7 +288,6 @@ function editPost($post, $files, $id) {
         
             $target_dir = $_SERVER['DOCUMENT_ROOT']."/cms/uploads/";
             $target_file = $target_dir.basename($files["image"]["name"]);
-            $uploadOk = 0;
             $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
             if (!empty($files["image"]["name"])) {
@@ -312,18 +310,17 @@ function editPost($post, $files, $id) {
                     } else {
                         $photoError = "Sorry, your file is too large.";
                     }
-                    $uploadOk = 1;
                 } else {
                     $photoError = "File is not an image.";
                 }
             }
 
             if(!isset($photoError)) {
-                if(!isset($image)) {
-                    $image = "no-photo.png";
-                }
                 $query = "UPDATE posts SET post_title='$title', post_category_id='$category', ";
-                $query .= "post_status='$status', post_image='$image', post_tags='$tags', post_content='$content' ";
+                if(isset($image)) {
+                    $query .= "post_image='$image', ";
+                }
+                $query .= "post_tags='$tags', post_content='$content' ";
                 $query .= "WHERE post_id='$id'";
                 $conn->exec($query);
                 echo "<h3 style='color: green;'>Post was editted succesfully!</h3>";

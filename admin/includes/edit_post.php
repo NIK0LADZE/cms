@@ -21,10 +21,6 @@ if(!$result) {
         </select>
     </div>
     <div class="form-group">
-        <label for="status">Status</label>
-        <input type="text" class="form-control" name="status" value="<?php echo $result["post_status"];?>">
-    </div>
-    <div class="form-group">
         <label for="image">Image</label><br>
         <img width="100" src="/cms/uploads/<?php echo $result["post_image"];?>" alt=""><br><br>
         <input type="file" name="image">

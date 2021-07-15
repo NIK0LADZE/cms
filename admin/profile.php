@@ -51,6 +51,7 @@
                                 if(isset($_GET["usernameError"])) { ?>
                                 <span style="color: red;">* <?php echo $_GET["usernameError"];?></span>
                                 <?php } ?>
+                                <input type="hidden" name="current-username" value="<?php echo $userData["username"];?>">
                                 <input type="text" class="form-control" name="username" value="<?php echo $userData["username"];?>" required>
                             </div>
                             <div class="form-group">

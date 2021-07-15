@@ -107,6 +107,13 @@ if(isset($_POST["update_user"])) {
 
         if(count($errArr) == 0) {
             openConn();
+            $currentUsername = $_POST["current-username"];
+            if($currentUsername !== $username) {
+                $updatePosts = "UPDATE posts SET post_author='$username' WHERE post_author='$currentUsername'";
+                $updateComments = "UPDATE comments SET comment_author='$username' WHERE comment_author='$currentUsername'";
+                $conn->exec($updatePosts);
+                $conn->exec($updateComments);
+            }
             $sql = "UPDATE users SET fname=:fname, lname=:lname, ";
             if(isset($username)) {
                 $sql .= "username=:username, ";
