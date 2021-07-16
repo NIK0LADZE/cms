@@ -9,5 +9,11 @@ body {
 }
 
 footer {
-    margin: 50px 0;
+    margin: 50px 0px;
+    margin-left: 450px;
+}
+
+.pager li .active {
+    color: white;
+    background-color: rgb(38, 119, 211) !important;
 }

@@ -31,6 +31,30 @@
                             delete("comments", $_POST["comment_id"]);
                         }
                         ?>
+                        <?php 
+                        openConn();
+                        $postPerPage = 10;
+                        $countSQL = "SELECT COUNT(id) as count FROM comments";
+                        $stmt = $conn->prepare($countSQL);
+                        $stmt->execute();
+                        $postCount = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $postCount = $postCount["count"];
+                        $pagerCount = ceil($postCount / $postPerPage); 
+                        if(isset($_GET["page"])) {
+                            if($_GET["page"] == 1) {
+                                $page = 1;
+                                $startPostsFrom = 0;
+                            } elseif($_GET["page"] == 0 || $_GET["page"] > $pagerCount || empty($_GET["page"])) {
+                                echo "<h1>This page doesn't exist.</h1>";
+                                return 0;
+                            } else {
+                                $page = $_GET["page"];
+                                $startPostsFrom = ($page - 1) * $postPerPage;
+                            }
+                        } else {
+                            $page = 1;
+                            $startPostsFrom = 0;
+                        } ?>
                         <table class="table table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -42,9 +66,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php displayComments();?>
+                                <?php displayComments($startPostsFrom, $postPerPage);?>
                             </tbody>
                         </table>
+                        <!-- Pager  -->
+                        <?php pager("comments.php?", $page, $pagerCount);?>
                     </div>
                 </div>
                 <!-- /.row -->

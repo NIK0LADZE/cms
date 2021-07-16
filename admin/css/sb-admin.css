@@ -251,3 +251,8 @@ ul.alert-dropdown {
     width: auto;
     height: 500px;
 }
+
+.pager li .active {
+    color: white;
+    background-color: rgb(38, 119, 211) !important;
+}

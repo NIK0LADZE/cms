@@ -22,10 +22,10 @@ function countData($table, $rowName) {
 
 /* Comments */
 
-function displayComments() {
+function displayComments($startPostsFrom, $postPerPage) {
     openConn();
     global $conn;
-    $sql = "SELECT comments.id, posts.post_id as post_id, comments.comment_author as author, posts.post_title as title, comments.comment_content as content, comment_date as date FROM comments INNER JOIN posts ON comments.post_id=posts.post_id";
+    $sql = "SELECT comments.id, posts.post_id as post_id, comments.comment_author as author, posts.post_title as title, comments.comment_content as content, comments.comment_date as date FROM comments INNER JOIN posts ON comments.post_id=posts.post_id ORDER BY comments.comment_date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $comments = $stmt->fetchAll();
@@ -81,10 +81,10 @@ function displayRoles($currentRole) {
     }
 }
 
-function displayUsers() {
+function displayUsers($startPostsFrom, $postPerPage) {
     openConn();
     global $conn;
-    $sql = "SELECT id, username, fname, lname, bdate, email, image, role FROM users";
+    $sql = "SELECT id, username, fname, lname, bdate, email, image, role FROM users ORDER BY id DESC LIMIT {$startPostsFrom}, {$postPerPage}";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -126,11 +126,11 @@ function displayUsers() {
 
 /* Posts */
 
-function displayPosts() {
+function displayPosts($startPostsFrom, $postPerPage) {
     openConn();
     global $conn;
     $sql = "SELECT post_id as id, post_author as author, post_title as title, post_category_id as category, 
-    post_image as image, post_tags as tags, post_views as views, post_comment_count as comments, post_date as date FROM posts";
+    post_image as image, post_tags as tags, post_views as views, post_comment_count as comments, post_date as date FROM posts ORDER BY post_date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
     $row = $conn->query($sql);
     $stmt = $conn->prepare($sql);
     $stmt->execute();

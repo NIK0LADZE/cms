@@ -8,16 +8,37 @@
             <!-- Blog Entries Column -->
             <div class="col-md-8">
 
+                <!-- Blog Post -->
+                <?php
+                openConn();
+                $postPerPage = 10;
+                $countSQL = "SELECT COUNT(post_id) as count FROM posts";
+                $stmt = $conn->prepare($countSQL);
+                $stmt->execute();
+                $postCount = $stmt->fetch(PDO::FETCH_ASSOC);
+                $postCount = $postCount["count"];
+                $pagerCount = ceil($postCount / $postPerPage); 
+                if(isset($_GET["page"])) {
+                    if($_GET["page"] == 1) {
+                        $page = 1;
+                        $startPostsFrom = 0;
+                    } elseif($_GET["page"] == 0 || $_GET["page"] > $pagerCount || empty($_GET["page"])) {
+                        echo "<h1>This page doesn't exist.</h1>";
+                        return 0;
+                    } else {
+                        $page = $_GET["page"];
+                        $startPostsFrom = ($page - 1) * $postPerPage;
+                    }
+                } else {
+                    $page = 1;
+                    $startPostsFrom = 0;
+                }
+                $posts = "SELECT * FROM posts ORDER BY post_date DESC LIMIT {$startPostsFrom}, {$postPerPage}"; ?>
                 <h1 class="page-header">
                     Page Heading
                     <small>Secondary Text</small>
                 </h1>
-
-                <!-- Blog Post -->
-                <?php
-                openConn();
-                $posts = "SELECT * FROM posts ORDER BY post_date DESC";
-                foreach ($conn->query($posts) as $post) { ?>
+                <?php foreach ($conn->query($posts) as $post) { ?>
                 <h2>
                     <a href="post.php?post_id=<?php echo $post["post_id"];?>"><?php echo $post["post_title"];?></a>
                 </h2>
@@ -36,14 +57,7 @@
                 <hr>
 
                 <!-- Pager -->
-                <ul class="pager">
-                    <li class="previous">
-                        <a href="#">&larr; Older</a>
-                    </li>
-                    <li class="next">
-                        <a href="#">Newer &rarr;</a>
-                    </li>
-                </ul>
+                <?php pager("index.php?", $page, $pagerCount);?>
 
             </div>
 
