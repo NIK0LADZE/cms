@@ -1,4 +1,9 @@
-<?php require_once("includes/header.php"); ?>
+<?php 
+require_once("includes/header.php"); 
+if(isset($_SESSION["auth"])) {
+    header("Location: /cms");
+}
+?>
 
     <!-- Page Content -->
     <div class="container">

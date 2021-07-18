@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <title>Blog Home - Start Bootstrap Template</title>
 
@@ -42,7 +43,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/cms/">Home</a>
+                <a class="navbar-brand active" href="/cms/">Home</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -68,3 +69,13 @@
         </div>
         <!-- /.container -->
     </nav>
+    <script>
+        $(document).ready(function(){
+            var activeurl = "<?=$_SERVER['REQUEST_URI']?>".split("/");
+            console.log(activeurl[activeurl.length - 1]);
+            $('.nav.navbar-nav a[href="'+activeurl[activeurl.length - 1]+'"]').parent('li').addClass('active');
+            if(activeurl[activeurl.length - 1] == "") {
+                $('.navbar-header>a').removeClass('navbar-brand').addClass('home');
+            }
+        })
+    </script>

@@ -17,3 +17,21 @@ footer {
     color: white;
     background-color: rgb(38, 119, 211) !important;
 }
+
+/* Setting active state for Home link */
+
+.home {
+    float:left;
+    height:50px;
+    padding:15px 15px;
+    font-size:18px;
+    line-height:20px;
+    margin-left: -15px;
+    color: #fff;
+}
+
+.navbar-inverse .home:focus,.navbar-inverse .home:hover {
+    color:#fff;
+    text-decoration: none;
+    background-color: transparent
+}
