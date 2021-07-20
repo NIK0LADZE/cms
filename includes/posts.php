@@ -1,16 +1,15 @@
-                        <?php
-                        foreach ($conn->query($posts) as $post) { ?>
+                        <?php foreach ($posts->post as $post) { ?>
                         <h2>
-                            <a href="post.php?post_id=<?php echo $post["post_id"];?>"><?php echo $post["post_title"];?></a>
+                            <a href="post.php?post_id=<?=$post["id"]?>"><?=$post["title"]?></a>
                         </h2>
                         <p class="lead">
-                            by <a href="/cms/author.php?author=<?=$post["post_author"]?>"><?php echo $post["post_author"];?></a>
+                            by <a href="/cms/author.php?author=<?=$post["author"]?>"><?=$post["author"]?></a>
                         </p>
-                        <p><span class="glyphicon glyphicon-time"></span> Posted on <?php echo date("F d, Y \a\\t H:i A", strtotime($post["post_date"]));?></p>
+                        <p><span class="glyphicon glyphicon-time"></span> Posted on <?=date("F d, Y \a\\t H:i A", strtotime($post["date"]))?></p>
                         <hr>
-                        <img class="img-responsive" src="/cms/uploads/<?php echo $post["post_image"];?>" alt="Post Image">
+                        <img class="img-responsive" src="/cms/uploads/<?=$post["image"];?>" alt="Post Image">
                         <hr>
-                        <p><?php echo substr($post["post_content"], 0, 200)."...";?></p>
-                        <a class="btn btn-primary" href="post.php?post_id=<?php echo $post["post_id"];?>">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <p><?=substr($post["content"], 0, 200)."..."?></p>
+                        <a class="btn btn-primary" href="post.php?post_id=<?=$post["id"];?>">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
                         <?php } 
-                        $conn = 0; ?>
+                        ?>

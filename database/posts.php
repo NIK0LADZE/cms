@@ -11,9 +11,9 @@ class PostPerPage extends Connection {
     public $pagerCount;
     public $page;
 
-    function __construct() {
+    function __construct($column) {
         $this->openConn();
-        $countSQL = "SELECT COUNT(post_id) as count FROM posts";
+        $countSQL = "SELECT COUNT(post_id) as count FROM posts WHERE ".$column;
         $stmt = $this->conn->prepare($countSQL);
         $stmt->execute();
         $this->postCount = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -43,10 +43,10 @@ class PostPerPage extends Connection {
 class Display extends Connection {
     public $post;
 
-    function __construct($startPostsFrom, $postPerPage) {
+    function __construct($column, $startPostsFrom, $postPerPage) {
         $this->openConn();
         $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category, post_image as image, post_content as content, post_date as date FROM posts
-        ORDER BY date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
+        WHERE ".$column." ORDER BY date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->post = $stmt->fetchAll();
