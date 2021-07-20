@@ -43,13 +43,27 @@ class PostPerPage extends Connection {
 class Display extends Connection {
     public $post;
 
-    function __construct($column, $startPostsFrom, $postPerPage) {
+    function __construct($column, $startPostsFrom = 0, $postPerPage = 1) {
         $this->openConn();
-        $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category, post_image as image, post_content as content, post_date as date FROM posts
+        $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
+        post_image as image, post_views as views, post_content as content, post_date as date FROM posts
         WHERE ".$column." ORDER BY date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->post = $stmt->fetchAll();
+    }
+
+    function __destruct() {
+        $this->conn = 0;
+    }
+}
+
+class Views extends Connection {
+    function __construct($views, $id) {
+        $this->openConn();
+        $viewSQL = "UPDATE posts SET post_views=? WHERE post_id=?";
+        $updateViews = $this->conn->prepare($viewSQL);
+        $updateViews->execute([$views, $id]);
     }
 
     function __destruct() {

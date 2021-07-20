@@ -11,22 +11,19 @@
                 <!-- Blog Post -->
                 <?php 
                 if(isset($_GET["post_id"])) {
+                    require_once("database/posts.php");
                     openConn();
                     $id = $_GET["post_id"];
-                    $sql = "SELECT post_author as author, post_title as title, post_image as image, post_views as views, post_date as date, post_content as content FROM posts WHERE post_id='$id'";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute();
-                    $post = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $count = $conn->query($sql)->rowCount();
-                    $views = $post["views"];
-                    $views++;
-                    $viewSQL = "UPDATE posts SET post_views={$views} WHERE post_id='$id'";
-                    $updateViews = $conn->prepare($viewSQL);
-                    $updateViews->execute();
-                    $conn = 0;
-                    if($count == 1) { ?>
+                    $posts = new Posts\Display("post_id='$id'");
+                    $count = count($posts->post);
+                    if($count == 1) { 
+                        $post = $posts->post[0];
+                        $views = $post["views"];
+                        $views++;
+                        $updateViews = new Posts\Views($views, $id);
+                        ?>
                         <!-- Title -->
-                        <h1><?php echo $post["title"];?></h1>
+                        <h1><?=$post["title"]?></h1>
         
                         <!-- Author -->
                         <p class="lead">
@@ -36,17 +33,17 @@
                         <hr>
         
                         <!-- Date/Time -->
-                        <p><span class="glyphicon glyphicon-time"></span> Posted on <?php echo date("F d, Y \a\\t H:i A", strtotime($post["date"]));?></p>
+                        <p><span class="glyphicon glyphicon-time"></span> Posted on <?=date("F d, Y \a\\t H:i A", strtotime($post["date"]))?></p>
         
                         <hr>
         
                         <!-- Preview Image -->
-                        <img class="img-responsive" src="/cms/uploads/<?php echo $post["image"];?>" alt="">
+                        <img class="img-responsive" src="/cms/uploads/<?=$post["image"]?>" alt="">
         
                         <hr>
         
                         <!-- Post Content -->
-                        <p><?php echo $post["content"];?></p>
+                        <p><?=$post["content"]?></p>
         
                         <hr>
         
