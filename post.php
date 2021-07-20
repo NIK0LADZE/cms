@@ -65,7 +65,7 @@
                                     <?php } ?>
                                     <textarea name="comment_content" style="resize: vertical; min-height: 100px;" class="form-control" rows="3" required></textarea>
                                 </div>
-                                <input type="hidden" name="post_id" value="<?php echo $_GET["post_id"];?>">
+                                <input type="hidden" name="post_id" value="<?=$_GET["post_id"]?>">
                                 <button name="addcomment" type="submit" class="btn btn-primary">Submit</button>
                             </form>
                         </div>
@@ -74,16 +74,10 @@
         
                         <!-- Comments -->
                         <?php 
-                        openConn();
+                        require_once("database/comments.php");
                         $post_id = $_GET["post_id"];
-                        $sql = "SELECT users.image as photo, comments.comment_author as author, comments.comment_content as content, comments.comment_date as date 
-                        FROM comments LEFT JOIN users ON comments.comment_author = users.username WHERE post_id={$post_id} ORDER BY date DESC";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->execute();
-                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
-                        $comments = $stmt->fetchAll();
-                        $conn = 0;
-                        foreach ($comments as $comment) { ?>
+                        $comments = new Comments\Display($post_id);
+                        foreach ($comments->comments as $comment) { ?>
                         <div class="media">
                             <a class="pull-left" href="#">
                                 <img class="media-object" width="64px" height="64px" src="/cms/uploads/users/<?php
@@ -95,10 +89,10 @@
                                 ?>" alt="User photo">
                             </a>
                             <div class="media-body">
-                                <h4 class="media-heading"><?php echo $comment["author"];?>
-                                    <small><?php echo date("F d, Y \a\\t H:i A", strtotime($comment["date"]));?></small>
+                                <h4 class="media-heading"><?=$comment["author"]?>
+                                    <small><?=date("F d, Y \a\\t H:i A", strtotime($comment["date"]))?></small>
                                 </h4>
-                                <?= $comment["content"];?>
+                                <?=$comment["content"];?>
                             </div>
                         </div>
                         <?php } ?>
