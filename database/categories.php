@@ -2,7 +2,6 @@
 require_once("conn.php");
 
 Class Categories extends Connection {
-    public $count;
     public $categories;
 
     /* Opening Database Connection */
@@ -17,8 +16,8 @@ Class Categories extends Connection {
         $sql = "SELECT COUNT(cat_title) as count FROM categories WHERE cat_title=? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$cat_title]);
-        $this->count = $stmt->fetch(PDO::FETCH_ASSOC);
-        $this->count = $this->count["count"];
+        $count = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $count["count"];
     }
 
     /* This method sends array in navigation */
