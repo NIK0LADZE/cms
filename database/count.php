@@ -9,9 +9,9 @@ class Count extends Connection {
 
     function __construct($table, $column, $content) {
         $this->openConn();
-        $sql = "SELECT COUNT(".$column.") as count FROM ".$table." WHERE ".$column."='$content' LIMIT 1";
+        $sql = "SELECT COUNT(?) as count FROM ".$table." WHERE ".$column."='$content' LIMIT 1";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([$column]);
         $this->count = $stmt->fetch(PDO::FETCH_ASSOC);
         $this->count = $this->count["count"];
     }

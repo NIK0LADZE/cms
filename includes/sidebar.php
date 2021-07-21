@@ -48,20 +48,29 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <ul class="list-unstyled">
-                                <?php displayCategories(); ?>
+                                <?php 
+                                require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/categories.php");
+                                $categories = new Categories();
+                                $categories->display();
+                                $categories = $categories->categories; 
+                                foreach ($categories as $key => $category) {
+                                    if($key % 2 == 0) {
+                                        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
+                                    }
+                                }
+                                ?>
                             </ul>
                         </div>
                         <!-- /.col-lg-6 -->
                         <div class="col-lg-6">
                             <ul class="list-unstyled">
-                                <li><a href="#">Category Name</a>
-                                </li>
-                                <li><a href="#">Category Name</a>
-                                </li>
-                                <li><a href="#">Category Name</a>
-                                </li>
-                                <li><a href="#">Category Name</a>
-                                </li>
+                                <?php
+                                foreach ($categories as $key => $category) {
+                                    if($key % 2 == 1) {
+                                        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
+                                    }
+                                }
+                                ?>
                             </ul>
                         </div>
                         <!-- /.col-lg-6 -->

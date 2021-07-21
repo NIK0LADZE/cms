@@ -48,8 +48,14 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <?php displayCategories(); ?>
-                    <?php
+                    <?php 
+                    require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/categories.php");
+                    $categories = new Categories();
+                    $categories->display(); 
+                    $categories = $categories->categories; 
+                    foreach ($categories as $key => $category) {
+                        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
+                    }
                     if(isset($_SESSION["auth"])) {
                         if($_SESSION["auth"] === "true") { ?>
                             <li><a href='/cms/admin'>Admin</a></li>

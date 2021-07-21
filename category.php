@@ -12,11 +12,11 @@
                 <?php
                 if(isset($_GET["category"])) {
                     require_once("database/posts.php");
-                    require_once("database/count.php");
+                    require_once("database/categories.php");
                     $cat_title=$_GET["category"];
                     $posts = new Posts();
                     // This object is set to check if category really exists in database
-                    $category = new Database\Count("categories", "cat_title", $cat_title);
+                    $category = new Categories();
                     $posts->perPage($cat_title);
                     $posts->display($posts->startPostsFrom, $posts->postPerPage, $cat_title);
                     $count = count($posts->post);
