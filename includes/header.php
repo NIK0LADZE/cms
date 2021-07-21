@@ -69,12 +69,13 @@
         </div>
         <!-- /.container -->
     </nav>
+    <!-- Tracks navigation and sets active links -->
     <script>
         $(document).ready(function(){
             var activeurl = "<?=$_SERVER['REQUEST_URI']?>".split("/");
-            console.log(activeurl[activeurl.length - 1]);
+            activeurl[activeurl.length - 1] = "/cms/" + activeurl[activeurl.length - 1];
             $('.nav.navbar-nav a[href="'+activeurl[activeurl.length - 1]+'"]').parent('li').addClass('active');
-            if(activeurl[activeurl.length - 1] == "") {
+            if(activeurl[activeurl.length - 1] == "/cms/") {
                 $('.navbar-header>a').removeClass('navbar-brand').addClass('home');
             }
         })

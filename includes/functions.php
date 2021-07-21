@@ -37,7 +37,7 @@ function displayCategories() {
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
     $categories = $stmt->fetchAll();
     foreach ($categories as $category) {
-        echo "<li><a href='category.php?category_title={$category['title']}'>{$category['title']}</a></li>";
+        echo "<li><a href='/cms/category.php?category_title={$category['title']}'>{$category['title']}</a></li>";
     }
     return $conn = 0;
 }
