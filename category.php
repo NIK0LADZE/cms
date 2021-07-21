@@ -10,13 +10,15 @@
 
                 <!-- Blog Post -->
                 <?php
-                if(isset($_GET["category_title"])) {
+                if(isset($_GET["category"])) {
                     require_once("database/posts.php");
                     require_once("database/count.php");
-                    $cat_title=$_GET["category_title"];
-                    $postCount = new Posts\PostPerPage("post_category='$cat_title'");
+                    $cat_title=$_GET["category"];
+                    $posts = new Posts();
+                    // This object is set to check if category really exists in database
                     $category = new Database\Count("categories", "cat_title", $cat_title);
-                    $posts = new Posts\Display("post_category='$cat_title'", $postCount->startPostsFrom, $postCount->postPerPage);
+                    $posts->perPage($cat_title);
+                    $posts->display($posts->startPostsFrom, $posts->postPerPage, $cat_title);
                     $count = count($posts->post);
 
                     if($count == 0) {
@@ -32,8 +34,8 @@
                         <?php require_once("includes/posts.php"); ?>
                         <hr>
 
-                        <!-- Pager -->
-                        <?php pager("category.php?category_title=".$cat_title."&", $postCount->page, $postCount->pagerCount);?>
+                        <!-- Pagination -->
+                        <?php pager("category.php?category=".$cat_title."&", $posts->page, $posts->pagerCount);?>
                     <?php } ?>
                 <?php } else {?>
                     <h1>This page doesn't exist.</h1>

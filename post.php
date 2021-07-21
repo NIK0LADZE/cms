@@ -13,7 +13,7 @@
                 if(isset($_GET["post_id"])) {
                     require_once("database/posts.php");
                     $id = $_GET["post_id"];
-                    $posts = new Posts\Posts();
+                    $posts = new Posts();
                     $post = $posts->display();
                     $count = count($post);
                     if($count == 1) { 

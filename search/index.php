@@ -10,10 +10,10 @@
 
                 <!-- Search Results -->
                 <?php 
-                require_once("../database/search.php");
                 require_once("../database/posts.php");
-                $postCount = new Posts\PostPerPage("post_tags LIKE ");
-                $posts = new Search\Results($postCount->startPostsFrom, $postCount->postPerPage);
+                $posts = new Posts();
+                $posts->perPage();
+                $posts->search($posts->startPostsFrom, $posts->postPerPage);
                 $count = count($posts->post);
                 
                 if($count == 0) {
@@ -26,8 +26,8 @@
                     <?php require_once("../includes/posts.php"); ?>
                     <hr>
 
-                    <!-- Pager -->
-                    <?php pager("?keyword=".$_GET['keyword']."&", $postCount->page, $postCount->pagerCount);?>
+                    <!-- Pagination -->
+                    <?php pager("?keyword=".$_GET['keyword']."&", $posts->page, $posts->pagerCount);?>
                 <?php } ?>
 
             </div>

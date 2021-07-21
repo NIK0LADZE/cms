@@ -11,8 +11,8 @@
                 <!-- Blog Post -->
                 <?php
                 require_once("database/posts.php");
-                $posts = new Posts\Posts(); 
-                $postCount = $posts->perPage();
+                $posts = new Posts(); 
+                $posts->perPage();
                 if (isset($posts->startPostsFrom)) {
                     $posts->display($posts->startPostsFrom, $posts->postPerPage);
                     ?>
@@ -23,7 +23,7 @@
                     <?php require_once("includes/posts.php"); ?>
                     <hr>
 
-                    <!-- Pager -->
+                    <!-- Pagination -->
                     <?php pager("index.php?", $posts->page, $posts->pagerCount);
                 } ?>
 
