@@ -13,7 +13,7 @@
                 if(isset($_GET["author"])) {
                     require_once("database/posts.php");
                     require_once("database/users.php");
-                    $author=$_GET["author"];
+                    $author = $_GET["author"];
                     $posts = new Posts();
                     $posts->perPage($author);
                     $posts->display($posts->startPostsFrom, $posts->postPerPage, $author);

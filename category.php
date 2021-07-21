@@ -13,7 +13,7 @@
                 if(isset($_GET["category"])) {
                     require_once("database/posts.php");
                     require_once("database/categories.php");
-                    $cat_title=$_GET["category"];
+                    $cat_title = $_GET["category"];
                     $posts = new Posts();
                     $posts->perPage($cat_title);
                     $posts->display($posts->startPostsFrom, $posts->postPerPage, $cat_title);
