@@ -1,5 +1,5 @@
 <?php
-namespace Categories;
+namespace Database;
 require_once("conn.php");
 use Connection;
 use PDO;
@@ -7,9 +7,9 @@ use PDO;
 class Count extends Connection {
     public $count;
 
-    function __construct($cat_title) {
+    function __construct($table, $subjectForCount, $column) {
         $this->openConn();
-        $sql = "SELECT COUNT(cat_title) as count FROM categories WHERE cat_title='$cat_title' LIMIT 1";
+        $sql = "SELECT COUNT($subjectForCount) as count FROM $table WHERE $column LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->count = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -12,10 +12,10 @@
                 <?php
                 if(isset($_GET["category_title"])) {
                     require_once("database/posts.php");
-                    require_once("database/categories.php");
+                    require_once("database/count.php");
                     $cat_title=$_GET["category_title"];
                     $postCount = new Posts\PostPerPage("post_category='$cat_title'");
-                    $category = new Categories\Count($cat_title);
+                    $category = new Database\Count("categories", "cat_title", "cat_title='$cat_title'");
                     $posts = new Posts\Display("post_category='$cat_title'", $postCount->startPostsFrom, $postCount->postPerPage);
                     $count = count($posts->post);
 

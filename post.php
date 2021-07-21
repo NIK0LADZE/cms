@@ -12,7 +12,6 @@
                 <?php 
                 if(isset($_GET["post_id"])) {
                     require_once("database/posts.php");
-                    openConn();
                     $id = $_GET["post_id"];
                     $posts = new Posts\Display("post_id='$id'");
                     $count = count($posts->post);
