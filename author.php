@@ -15,7 +15,7 @@
                     require_once("database/count.php");
                     $author=$_GET["author"];
                     $postCount = new Posts\PostPerPage("post_author='$author'");
-                    $authors = new Database\Count("posts", "post_author", "post_author='$author'");
+                    $authors = new Database\Count("users", "username", $author);
                     $posts = new Posts\Display("post_author='$author'", $postCount->startPostsFrom, $postCount->postPerPage);
                     $count = count($posts->post);
                     

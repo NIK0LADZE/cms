@@ -7,9 +7,9 @@ use PDO;
 class Count extends Connection {
     public $count;
 
-    function __construct($table, $subjectForCount, $column) {
+    function __construct($table, $column, $content) {
         $this->openConn();
-        $sql = "SELECT COUNT($subjectForCount) as count FROM $table WHERE $column LIMIT 1";
+        $sql = "SELECT COUNT(".$column.") as count FROM ".$table." WHERE ".$column."='$content' LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->count = $stmt->fetch(PDO::FETCH_ASSOC);

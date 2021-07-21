@@ -15,7 +15,7 @@
                     require_once("database/count.php");
                     $cat_title=$_GET["category_title"];
                     $postCount = new Posts\PostPerPage("post_category='$cat_title'");
-                    $category = new Database\Count("categories", "cat_title", "cat_title='$cat_title'");
+                    $category = new Database\Count("categories", "cat_title", $cat_title);
                     $posts = new Posts\Display("post_category='$cat_title'", $postCount->startPostsFrom, $postCount->postPerPage);
                     $count = count($posts->post);
 
