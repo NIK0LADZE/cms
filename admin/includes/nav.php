@@ -117,10 +117,7 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li>
-                        <a href="index.php"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Charts</a>
+                        <a href="index.php"><i class="fa fa-fw fa-bar-chart-o"></i> Dashboard</a>
                     </li>
                     <li>
                         <a href="users.php"><i class="fas fa-users"></i> Users</a>
