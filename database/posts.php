@@ -14,6 +14,15 @@ class PostPerPage extends Connection {
     function __construct($column) {
         $this->openConn();
         $countSQL = "SELECT COUNT(post_id) as count FROM posts WHERE ".$column;
+        if(isset($_GET["keyword"])) {
+            $keyword = explode(" ", $_GET["keyword"]);
+            foreach ($keyword as $key => $value) {
+                if($key > 0) {
+                    $countSQL .= "OR";
+                }
+                $countSQL .= "'%".$value."%'";
+            } 
+        }
         $stmt = $this->conn->prepare($countSQL);
         $stmt->execute();
         $this->postCount = $stmt->fetch(PDO::FETCH_ASSOC);

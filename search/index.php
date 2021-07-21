@@ -8,8 +8,27 @@
             <!-- Blog Entries Column -->
             <div class="col-md-8">
 
-                <!-- First Blog Post -->
-                <?php search($_GET["keyword"]);?>
+                <!-- Search Results -->
+                <?php 
+                require_once("../database/search.php");
+                require_once("../database/posts.php");
+                $postCount = new Posts\PostPerPage("post_tags LIKE ");
+                $posts = new Search\Results($postCount->startPostsFrom, $postCount->postPerPage);
+                $count = count($posts->post);
+                
+                if($count == 0) {
+                    echo "<h2>NO RESULT!</h2>";
+                } else { ?>
+                    <h1 class="page-header">
+                        Search
+                        <small><?=$_GET["keyword"]?></small>
+                    </h1>
+                    <?php require_once("../includes/posts.php"); ?>
+                    <hr>
+
+                    <!-- Pager -->
+                    <?php pager("?keyword=".$_GET['keyword']."&", $postCount->page, $postCount->pagerCount);?>
+                <?php } ?>
 
             </div>
 
