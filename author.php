@@ -12,15 +12,17 @@
                 <?php
                 if(isset($_GET["author"])) {
                     require_once("database/posts.php");
-                    require_once("database/count.php");
+                    require_once("database/users.php");
                     $author=$_GET["author"];
-                    $postCount = new Posts\PostPerPage("post_author='$author'");
-                    $authors = new Database\Count("users", "username", $author);
-                    $posts = new Posts\Display("post_author='$author'", $postCount->startPostsFrom, $postCount->postPerPage);
+                    $posts = new Posts();
+                    $posts->perPage($author);
+                    $posts->display($posts->startPostsFrom, $posts->postPerPage, $author);
                     $count = count($posts->post);
                     
                     if($count == 0) {
-                        if($authors->count == 0) {
+                        // This object is set to check if user really exists in database
+                        $authors = new Users();
+                        if($authors->count($author) == 0) {
                             echo "<h1>This page doesn't exist.</h1>";
                         } else {
                             echo "<h1>No posts yet.</h1>";
@@ -32,8 +34,8 @@
                         <?php require_once("includes/posts.php"); ?>
                         <hr>
 
-                        <!-- Pager -->
-                        <?php pager("author.php?author=".$author."&", $postCount->page, $postCount->pagerCount);?>
+                        <!-- Pagination -->
+                        <?php pager("author.php?author=".$author."&", $posts->page, $posts->pagerCount);?>
                     <?php } ?>
                 <?php } else {?>
                     <h1>This page doesn't exist.</h1>

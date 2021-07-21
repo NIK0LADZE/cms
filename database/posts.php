@@ -22,11 +22,17 @@ class Posts extends Connection {
         $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
         post_image as image, post_views as views, post_content as content, post_date as date FROM posts
         WHERE ";
+        // Displays post on post page
         if(isset($_GET["post_id"])) {
             $content = $_GET["post_id"];
             $sql .= "post_id=?";
+        // Displays posts on selected category page
         } elseif(isset($_GET["category"])) {
             $sql .= "post_category=?";
+        // Displays posts on selected user page
+        } elseif(isset($_GET["author"])) {
+            $sql .= "post_author=?";
+        // Displays posts on home page
         } else {
             $sql .= "1=?";
         }
@@ -62,19 +68,22 @@ class Posts extends Connection {
                 }
                 $countSQL .= "?";
             } 
+        // Calculates amount of posts in selected category
         } elseif(isset($_GET["category"])) {
-            // Calculates amount of posts in selected category
             $countSQL .= "post_category=?";
+        // Calculates amount of posts by selected user
+        } elseif(isset($_GET["author"])) {
+            $countSQL .= "post_author=?";
+        // Displays all posts for home page
         } else {
-            // Displays all posts for home page
             $countSQL .= "1=?";
         }
         $stmt = $this->conn->prepare($countSQL);
+        // This line only gets executed when user searches for posts
         if(isset($_GET["keyword"])) {
-            // This line only gets executed when user searches for posts
             $stmt->execute($keywords);
+        // This line gets executed in any other occasions
         } else {
-            // This line gets executed in any other occasions
             $stmt->execute([$content]);
         }
         // Calculates diapason of posts which should be shown on each page
