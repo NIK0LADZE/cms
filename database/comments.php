@@ -1,8 +1,5 @@
 <?php
-namespace Comments;
 require_once("conn.php");
-use Connection;
-use PDO;
 
 class Comments extends Connection {
     public $comments;

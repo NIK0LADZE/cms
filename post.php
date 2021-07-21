@@ -13,13 +13,14 @@
                 if(isset($_GET["post_id"])) {
                     require_once("database/posts.php");
                     $id = $_GET["post_id"];
-                    $posts = new Posts\Display("post_id='$id'");
-                    $count = count($posts->post);
+                    $posts = new Posts\Posts();
+                    $post = $posts->display();
+                    $count = count($post);
                     if($count == 1) { 
-                        $post = $posts->post[0];
+                        $post = $post[0];
                         $views = $post["views"];
                         $views++;
-                        $updateViews = new Posts\Views($views, $id);
+                        $posts->updateViews($views, $id);
                         ?>
                         <!-- Title -->
                         <h1><?=$post["title"]?></h1>
@@ -75,7 +76,7 @@
                         <?php 
                         require_once("database/comments.php");
                         $post_id = $_GET["post_id"];
-                        $comments = new Comments\Comments();
+                        $comments = new Comments();
                         $comments = $comments->display($post_id);
                         foreach ($comments as $comment) { ?>
                         <div class="media">

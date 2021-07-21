@@ -11,9 +11,11 @@
                 <!-- Blog Post -->
                 <?php
                 require_once("database/posts.php");
-                $postCount = new Posts\PostPerPage(1);
-                if (isset($postCount->startPostsFrom)) {
-                    $posts = new Posts\Display(1, $postCount->startPostsFrom, $postCount->postPerPage); ?>
+                $posts = new Posts\Posts(); 
+                $postCount = $posts->perPage();
+                if (isset($posts->startPostsFrom)) {
+                    $posts->display($posts->startPostsFrom, $posts->postPerPage);
+                    ?>
                     <h1 class="page-header">
                         Page Heading
                         <small>Secondary Text</small>
@@ -22,7 +24,7 @@
                     <hr>
 
                     <!-- Pager -->
-                    <?php pager("index.php?", $postCount->page, $postCount->pagerCount);
+                    <?php pager("index.php?", $posts->page, $posts->pagerCount);
                 } ?>
 
             </div>

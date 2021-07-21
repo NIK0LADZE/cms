@@ -12,7 +12,7 @@ if(isset($_POST["addcomment"])) {
         $post_id = $_POST["post_id"];
 
         require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/comments.php");
-        $comments = new Comments\Comments();
+        $comments = new Comments();
         $comments->insert($post_id, $author, $comment);
         header("Location: ".$_SERVER["HTTP_REFERER"]);
     }

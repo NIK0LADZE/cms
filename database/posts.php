@@ -4,16 +4,42 @@ require_once("conn.php");
 use Connection;
 use PDO;
 
-class PostPerPage extends Connection {
+class Posts extends Connection {
+    public $post;
     public $postPerPage = 10;
     public $startPostsFrom;
     public $postCount;
     public $pagerCount;
     public $page;
 
-    function __construct($column) {
+    function __construct() {
         $this->openConn();
-        $countSQL = "SELECT COUNT(post_id) as count FROM posts WHERE ".$column;
+    }
+
+    function display($startPostsFrom = 0, $postPerPage = 1, $content = 1) {
+        $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
+        post_image as image, post_views as views, post_content as content, post_date as date FROM posts
+        WHERE ";
+        if(isset($_GET["post_id"])) {
+            $content = $_GET["post_id"];
+            $sql .= "post_id=?";
+        } else {
+            $sql .= "1=?";
+        }
+        $sql .= " ORDER BY date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$content]);
+        return $this->post = $stmt->fetchAll();
+    }
+
+    function updateViews($views, $id) {
+        $viewSQL = "UPDATE posts SET post_views=? WHERE post_id=?";
+        $updateViews = $this->conn->prepare($viewSQL);
+        $updateViews->execute([$views, $id]);
+    }
+
+    function perPage($content = 1) {
+        $countSQL = "SELECT COUNT(post_id) as count FROM posts WHERE ".$content;
         if(isset($_GET["keyword"])) {
             $keyword = explode(" ", $_GET["keyword"]);
             foreach ($keyword as $key => $value) {
@@ -42,37 +68,6 @@ class PostPerPage extends Connection {
             $this->page = 1;
             $this->startPostsFrom = 0;
         }
-    }
-
-    function __destruct() {
-        $this->conn = 0;
-    }
-}
-
-class Display extends Connection {
-    public $post;
-
-    function __construct($column, $startPostsFrom = 0, $postPerPage = 1) {
-        $this->openConn();
-        $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
-        post_image as image, post_views as views, post_content as content, post_date as date FROM posts
-        WHERE ".$column." ORDER BY date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        $this->post = $stmt->fetchAll();
-    }
-
-    function __destruct() {
-        $this->conn = 0;
-    }
-}
-
-class Views extends Connection {
-    function __construct($views, $id) {
-        $this->openConn();
-        $viewSQL = "UPDATE posts SET post_views=? WHERE post_id=?";
-        $updateViews = $this->conn->prepare($viewSQL);
-        $updateViews->execute([$views, $id]);
     }
 
     function __destruct() {
