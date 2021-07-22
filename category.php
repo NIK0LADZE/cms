@@ -16,8 +16,8 @@
                     $cat_title = $_GET["category"];
                     $posts = new Posts();
                     $posts->perPage($cat_title);
-                    $posts->display($posts->startPostsFrom, $posts->postPerPage, $cat_title);
-                    $count = count($posts->post);
+                    $posts->display($cat_title);
+                    $count = count($posts->array);
                     
                     if($count == 0) {
                         // This object is set to check if category really exists in database

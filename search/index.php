@@ -13,8 +13,8 @@
                 require_once("../database/posts.php");
                 $posts = new Posts();
                 $posts->perPage();
-                $posts->search($posts->startPostsFrom, $posts->postPerPage);
-                $count = count($posts->post);
+                $posts->search();
+                $count = count($posts->array);
                 
                 if($count == 0) {
                     echo "<h2>NO RESULT!</h2>";

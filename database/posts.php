@@ -3,8 +3,8 @@ require_once("conn.php");
 
 class Posts extends Connection {
     /* Properties for Posts */
-    public $post;
-    public $postPerPage = 10;
+    public $array;
+    public $perPage = 10;
     public $startPostsFrom;
     public $postCount;
     public $pagerCount;
@@ -12,12 +12,11 @@ class Posts extends Connection {
     public $count;
 
     /* Opening Database Connection */
-
     function __construct() {
         $this->openConn();
     }
 
-    // This method counts total amount of posts
+    /* This method counts total amount of posts */
     function countPosts() {
         $sql = "SELECT COUNT(post_id) as count FROM posts";
         $stmt = $this->conn->prepare($sql);
@@ -27,8 +26,7 @@ class Posts extends Connection {
     }
 
     /* This method displays posts */
-
-    function display($startPostsFrom = 0, $postPerPage = 1, $content = 1) {
+    function display($content = 1) {
         $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
         post_image as image, post_views as views, post_content as content, post_date as date FROM posts
         WHERE ";
@@ -36,6 +34,8 @@ class Posts extends Connection {
         if(isset($_GET["post_id"])) {
             $content = $_GET["post_id"];
             $sql .= "post_id=?";
+            $this->startPostsFrom = 0;
+            $this->perPage = 1;
         // Displays posts on selected category page
         } elseif(isset($_GET["category"])) {
             $sql .= "post_category=?";
@@ -47,14 +47,13 @@ class Posts extends Connection {
             $sql .= "1=?";
         }
         // Sets diapason for posts to be shown on each page
-        $sql .= " ORDER BY date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
+        $sql .= " ORDER BY date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$content]);
-        return $this->post = $stmt->fetchAll();
+        return $this->array = $stmt->fetchAll();
     }
 
     /* This method counts how many times each post was viewed */
-
     function updateViews($views, $id) {
         $viewSQL = "UPDATE posts SET post_views=? WHERE post_id=?";
         $updateViews = $this->conn->prepare($viewSQL);
@@ -62,7 +61,6 @@ class Posts extends Connection {
     }
 
     /* This method counts how many posts are on different pages and applies it to pagination */
-
     function perPage($content = 1) {
         $countSQL = "SELECT COUNT(post_id) as count FROM posts WHERE ";
         if(isset($_GET["keyword"])) {
@@ -99,7 +97,7 @@ class Posts extends Connection {
         // Calculates diapason of posts which should be shown on each page
         $this->postCount = $stmt->fetch(PDO::FETCH_ASSOC);
         $this->postCount = $this->postCount["count"];
-        $this->pagerCount = ceil($this->postCount / $this->postPerPage); 
+        $this->pagerCount = ceil($this->postCount / $this->perPage); 
         if(isset($_GET["page"])) {
             if($_GET["page"] == 1) {
                 $this->page = 1;
@@ -108,7 +106,7 @@ class Posts extends Connection {
                 echo "<h1>This page doesn't exist.</h1>";
             } else {
                 $this->page = $_GET["page"];
-                $this->startPostsFrom = ($this->page - 1) * $this->postPerPage;
+                $this->startPostsFrom = ($this->page - 1) * $this->perPage;
             }
         } else {
             $this->page = 1;
@@ -117,8 +115,7 @@ class Posts extends Connection {
     }
 
     /* Search method */
-
-    function search($startPostsFrom, $postPerPage) {
+    function search() {
         if(empty($_GET["keyword"])) {
             return header("Location: /cms/");
         } else {
@@ -135,15 +132,14 @@ class Posts extends Connection {
                 }
                 $sql .= "?";
             } 
-            $sql .= " ORDER BY post_date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
+            $sql .= " ORDER BY post_date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute($keywords);
-            return $this->post = $stmt->fetchAll();
+            return $this->array = $stmt->fetchAll();
         }
     }
 
     /* Closing Database Connection */
-
     function __destruct() {
         $this->conn = 0;
     }

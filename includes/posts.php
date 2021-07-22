@@ -1,4 +1,4 @@
-                        <?php foreach ($posts->post as $post) { ?>
+                        <?php foreach ($posts->array as $post) { ?>
                         <h2>
                             <a href="post.php?post_id=<?=$post["id"]?>"><?=$post["title"]?></a>
                         </h2>

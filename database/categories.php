@@ -3,6 +3,7 @@ require_once("conn.php");
 
 Class Categories extends Connection {
     public $categories;
+    public $count;
 
     /* Opening Database Connection */
     function __construct() {

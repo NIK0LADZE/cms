@@ -14,7 +14,7 @@
                 $posts = new Posts(); 
                 $posts->perPage();
                 if (isset($posts->startPostsFrom)) {
-                    $posts->display($posts->startPostsFrom, $posts->postPerPage);
+                    $posts->display();
                     ?>
                     <h1 class="page-header">
                         Page Heading

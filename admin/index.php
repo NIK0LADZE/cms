@@ -158,10 +158,10 @@
                         function drawChart() {
                             var data = google.visualization.arrayToDataTable([
                             ['Element', 'Amount', { role: 'style' }],
-                            ['Posts', <?php countData("posts", "post_id");?>, 'color: blue; opacity: 0.75'],
-                            ['Comments', <?php countData("comments", "id");?>, 'color: green; opacity: 0.75'],
-                            ['Users', <?php countData("users", "id");?>, 'color: orange; opacity: 0.75'],
-                            ['Categories', <?php countData("categories", "id");?>, 'color: red; opacity: 0.75']
+                            ['Posts', <?php $posts->countPosts();?>, 'color: blue; opacity: 0.75'],
+                            ['Comments', <?php $comments->countComments();?>, 'color: green; opacity: 0.75'],
+                            ['Users', <?php $users->countUsers();?>, 'color: orange; opacity: 0.75'],
+                            ['Categories', <?php $categories->countCategories();;?>, 'color: red; opacity: 0.75']
                             ]);
 
                             var options = {

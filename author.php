@@ -16,8 +16,8 @@
                     $author = $_GET["author"];
                     $posts = new Posts();
                     $posts->perPage($author);
-                    $posts->display($posts->startPostsFrom, $posts->postPerPage, $author);
-                    $count = count($posts->post);
+                    $posts->display($author);
+                    $count = count($posts->array);
                     
                     if($count == 0) {
                         // This object is set to check if user really exists in database

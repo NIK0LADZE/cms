@@ -10,16 +10,6 @@ function delete($table, $id) {
     }
 }
 
-function countData($table, $rowName) {
-    openConn();
-    global $conn;
-    $query = "SELECT COUNT(".$rowName.") as count FROM ".$table;
-    $countData = $conn->prepare($query);
-    $countData->execute();
-    $count = $countData->fetch(PDO::FETCH_ASSOC);
-    echo $count["count"];
-}
-
 /* Comments */
 
 function displayComments($startPostsFrom, $postPerPage) {
@@ -51,77 +41,6 @@ function displayComments($startPostsFrom, $postPerPage) {
             <?php } ?>
         </tr>
     <?php }
-}
-
-/* Users */
-
-function setUserRole($post) {
-    if(isset($post["set_role"])) {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            openConn();
-            global $conn;
-            $id = $post["set_role"];
-            $role = $post["role_for_user_".$id];
-            $sql = "UPDATE users SET role='$role' WHERE id={$id}";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            return $conn = 0;
-        }
-    }
-}
-
-function displayRoles($currentRole) {
-    $roles = ["Admin", "Moderator", "Subscriber"];
-    foreach ($roles as $role) {
-        if($role == $currentRole) { ?>
-        <option value="<?php echo $role;?>" selected><?php echo $role;?></option>
-        <?php } else { ?>
-        <option value="<?php echo $role;?>"><?php echo $role;?></option>
-        <?php }
-    }
-}
-
-function displayUsers($startPostsFrom, $postPerPage) {
-    openConn();
-    global $conn;
-    $sql = "SELECT id, username, fname, lname, bdate, email, image, role FROM users ORDER BY id DESC LIMIT {$startPostsFrom}, {$postPerPage}";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_ASSOC);
-    $users = $stmt->fetchAll();
-    foreach ($users as $user) { ?>
-        <tr>
-            <?php 
-            foreach ($user as $key => $value) { 
-                if($key == "image") { ?>
-                    <td><p><img width="50px;" height="50px;" src="/cms/uploads/users/<?php echo $value;?>" alt="User image"></p></td>
-                <?php } elseif($key == "role") { ?>
-                    <td>
-                        <?php if($_SESSION["role"] === "Admin") { ?>
-                        <select name="role_for_user_<?php echo $user['id'];?>">
-                            <?php displayRoles($user["role"]); ?>
-                        </select>
-                        <?php } else { ?>
-                            <?php echo $user["role"];?>
-                        <?php } ?>
-                    </td>
-                <?php } elseif($key == "username") { ?>
-                    <td><p><a href="/cms/author.php?author=<?=$user["username"]?>"><?=$value?></a></p></td>
-                <?php } else { ?>
-                    <td><p><?php echo $value;?></p></td>
-                <?php }
-            } 
-            if($_SESSION["role"] === "Admin") { ?>
-            <td style="width: 6%;">
-                <button name="set_role" value="<?php echo $user['id'];?>" type="submit"><i class="fas fa-check"></i> Save</button>
-            </td>
-            <td style="width: 6%;">
-                <button name="delete_user" onclick="javascript: return confirm('Are you sure you want to delete this user?');" value="<?php echo $user['id'];?>" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
-            </td>
-            <?php } ?>
-        </tr>
-    <?php }
-    return $conn = 0;
 }
 
 /* Posts */
