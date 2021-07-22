@@ -1,6 +1,6 @@
 <?php require_once("../includes/db.php"); ?>
 <?php require_once("includes/functions.php"); ?>
-<?php require_once("../includes/functions.php"); ?>
+<?php require_once("../includes/pager.php"); ?>
 <?php 
 session_start();
 if(!isset($_SESSION["auth"])) {

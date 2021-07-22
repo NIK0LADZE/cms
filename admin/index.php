@@ -38,7 +38,14 @@
                                         <i class="fa fa-file-text fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class='huge'><?php countData("posts", "post_id");?></div>
+                                        <div class='huge'>
+                                            <?php 
+                                            // Counts Posts
+                                            require_once("../database/posts.php");
+                                            $posts = new Posts();
+                                            $posts->countPosts();
+                                            ?>
+                                        </div>
                                         <div>Posts</div>
                                     </div>
                                 </div>
@@ -60,7 +67,14 @@
                                         <i class="fa fa-comments fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class='huge'><?php countData("comments", "id");?></div>
+                                        <div class='huge'>
+                                            <?php 
+                                            // Counts Comments
+                                            require_once("../database/comments.php");
+                                            $comments = new Comments();
+                                            $comments->countComments();
+                                            ?>
+                                        </div>
                                         <div>Comments</div>
                                     </div>
                                 </div>
@@ -82,7 +96,14 @@
                                         <i class="fa fa-user fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class='huge'><?php countData("users", "id");?></div>
+                                        <div class='huge'>
+                                            <?php 
+                                            // Counts Users
+                                            require_once("../database/users.php");
+                                            $users = new Users();
+                                            $users->countUsers();
+                                            ?>
+                                        </div>
                                         <div> Users</div>
                                     </div>
                                 </div>
@@ -104,7 +125,14 @@
                                         <i class="fa fa-list fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class='huge'><?php countData("categories", "id");?></div>
+                                        <div class='huge'>
+                                            <?php 
+                                            // Counts Categories
+                                            require_once("../database/categories.php");
+                                            $categories = new Categories();
+                                            $categories->countCategories();
+                                            ?>
+                                        </div>
                                         <div>Categories</div>
                                     </div>
                                 </div>
@@ -121,6 +149,7 @@
                 </div>
                 <!-- /.row -->
                 <div class="row">
+                    <!-- Draws chart for dashboard -->
                     <div id="chart"></div>
                     <script type="text/javascript">
                         google.charts.load('current', {'packages':['corechart']});

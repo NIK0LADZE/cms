@@ -1,5 +1,5 @@
 <?php require_once($_SERVER['DOCUMENT_ROOT']."/cms/includes/db.php"); ?>
-<?php require_once($_SERVER['DOCUMENT_ROOT']."/cms/includes/functions.php"); ?>
+<?php require_once($_SERVER['DOCUMENT_ROOT']."/cms/includes/pager.php"); ?>
 <?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">

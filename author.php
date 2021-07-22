@@ -22,7 +22,7 @@
                     if($count == 0) {
                         // This object is set to check if user really exists in database
                         $authors = new Users();
-                        if($authors->count($author) == 0) {
+                        if($authors->checkUser($author) == 0) {
                             echo "<h1>This page doesn't exist.</h1>";
                         } else {
                             echo "<h1>No posts yet.</h1>";

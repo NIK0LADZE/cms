@@ -152,7 +152,8 @@
                     </div>
                     <!-- /.navbar-collapse -->
         </nav>
-
+        
+        <!-- Tracks navigation and sets active links -->
         <script>
             $(document).ready(function(){
                 var activeurl = "<?php echo $_SERVER['REQUEST_URI'];?>".split("/");
