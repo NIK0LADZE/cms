@@ -28,17 +28,4 @@ function pager($link, $page, $pagerCount) { ?>
     </ul>
 <?php }
 
-function displayCategories() {
-    openConn();
-    global $conn;
-    $sql = "SELECT cat_title as title FROM categories";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_ASSOC);
-    $categories = $stmt->fetchAll();
-    foreach ($categories as $category) {
-        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
-    }
-    return $conn = 0;
-}
 ?>

@@ -9,8 +9,17 @@ Class Categories extends Connection {
         $this->openConn();
     }
 
+    // This method counts total amount of comments
+    function countCategories() {
+        $sql = "SELECT COUNT(id) as count FROM categories";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $count = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo $this->count = $count["count"];
+    }
+
     /* This method checks if category really exists */
-    function count($cat_title) {
+    function checkCategory($cat_title) {
         $sql = "SELECT COUNT(cat_title) as count FROM categories WHERE cat_title=? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$cat_title]);

@@ -22,7 +22,7 @@
                     if($count == 0) {
                         // This object is set to check if category really exists in database
                         $category = new Categories();
-                        if($category->count($cat_title) == 0) {
+                        if($category->checkCategory($cat_title) == 0) {
                             echo "<h1>This page doesn't exist.</h1>";
                         } else {
                             echo "<h1>No posts yet.</h1>";
