@@ -1,4 +1,12 @@
-<?php require_once("includes/header.php"); ?>
+<?php 
+require_once("includes/header.php"); 
+require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/categories.php");
+$categories = new Categories;
+$categories->insert();
+$categories->update();
+$categories->delete();
+$categories->display();
+?>
 
 <body>
 
@@ -28,7 +36,6 @@
                         </ol>
                         <?php if($_SESSION["role"] === "Admin" || $_SESSION["role"] === "Moderator") { ?>
                             <div class="col-xs-6">
-                                <?php addCat($_POST); ?>
                                 <form action="" method="post">
                                     <div class="form-group">
                                         <input type="text" class="form-control" name="cat_title">
@@ -43,14 +50,7 @@
                         } else {
                           $size = 12;  
                         } ?>
-                        <div class="col-xs-<?php echo $size;?>">
-
-                            <?php 
-                            if(isset($_POST["delete_category"])) {
-                                delete("categories", $_POST["cat_id"]);
-                            }
-                            updateCat($_POST);
-                            ?>
+                        <div class="col-xs-<?=$size?>">
                                     
                             <table class="table table-bordered table-hover cat-table">
                                 <thead>
@@ -60,7 +60,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php displayCats();?>
+                                    <?php 
+                                    foreach ($categories->categories as $cat) { ?>
+                                        <tr>
+                                            <td><p><?php echo $cat['id'];?></p></td>
+                                            <td id="title">
+                                                <p id="<?php echo $cat['title'];?>"><a href="/cms/category.php?category_title=<?=$cat['title']?>"><?=$cat['title']?></a></p>
+                                                <form action="" method="post">
+                                                    <input type="hidden" name="old" value="<?php echo $cat['title'];?>">
+                                                    <input type="hidden" name="new" class="edit" id="<?php echo $cat['title'].'_for_input';?>" value="<?php echo $cat['title'];?>">
+                                                </form>
+                                            </td>
+                                            <?php if($_SESSION["role"] === "Admin" || $_SESSION["role"] === "Moderator") { ?>
+                                                <td style="width: 10%; text-align: center;">
+                                                    <button onclick="document.getElementById('<?php echo $cat['title'];?>').style.display = 'none'; document.getElementById('<?php echo $cat['title'];?>_for_input').setAttribute('type', 'text');" name="edit" type="submit"><i class="far fa-edit"></i> Edit</button>
+                                                </td>
+                                                <td style="width: 12%; text-align: center;">
+                                                    <form id="delete" action="" method="post">
+                                                        <input type="hidden" name="cat_id" value="<?php echo $cat['id'];?>">
+                                                        <button name="delete_category" onclick="javascript: return confirm('Are you sure you want to delete this category?');" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
+                                                    </form>
+                                                </td>
+                                            <?php } ?>
+                                        </tr>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>

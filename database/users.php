@@ -18,11 +18,13 @@ Class Users extends Connection {
 
     /* This method deletes user */
     function delete() {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $id = $_POST["delete_user"];
-            $sql = "DELETE FROM users where id=?";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$id]);
+        if(isset($_POST["delete_user"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $id = $_POST["delete_user"];
+                $sql = "DELETE FROM users where id=?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$id]);
+            }
         }
     }
 
