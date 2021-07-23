@@ -33,7 +33,7 @@
                         $users->data($id);
                         ?>
                         <div style="display: flex; justify-content: center; width: 100%; margin: 30px 0;">
-                            <img style="border-radius: 50%; " src="/cms/uploads/users/<?php echo $users->data["image"];?>" width="300px" height="300px" alt="User Photo">
+                            <img style="border-radius: 50%; object-fit: cover;" src="/cms/uploads/users/<?php echo $users->data["image"];?>" width="300px" height="300px" alt="User Photo">
                         </div>
                         <?php 
                         if(isset($_GET["success"])) {

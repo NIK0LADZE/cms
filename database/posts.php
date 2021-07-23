@@ -3,6 +3,7 @@ require_once("conn.php");
 
 class Posts extends Connection {
     /* Properties for Posts */
+    public $data;
     public $array;
     public $perPage = 10;
     public $startPostsFrom;
@@ -22,6 +23,152 @@ class Posts extends Connection {
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
         echo $count["count"];
+    }
+
+    // This method adds new posts
+    function insert() {
+        if(isset($_POST["add_post"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $title = $_POST["title"];
+                $category = $_POST["category"];
+                $author = $_SESSION["username"];
+                $tags = $_POST["tags"];
+                $content = $_POST["content"];
+                
+                // Photo Upload System
+                
+                $target_dir = $_SERVER['DOCUMENT_ROOT']."/cms/uploads/";
+                $target_file = $target_dir.basename($_FILES["image"]["name"]);
+                $uploadOk = 0;
+                $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                
+                if (!empty($_FILES["image"]["name"])) {
+                    $checkPhoto = getimagesize($_FILES["image"]["tmp_name"]);
+                    if ($checkPhoto !== false) {
+                        if ($_FILES["image"]["size"] < 500000000) {
+                            if ($fileType == "jpg" || $fileType == "jpeg" || $fileType == "png") {
+                                if (!file_exists($target_file)) {
+                                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                                        $image = basename($_FILES["image"]["name"]);
+                                    } else {
+                                        $photoError = "Sorry, there was an error uploading your file.";
+                                    }
+                                } else {
+                                    $photoError = "Sorry, file already exists.";
+                                }
+                            } else {
+                                $photoError = "Sorry, only JPG, JPEG & PNG files are allowed.";
+                            }
+                        } else {
+                            $photoError = "Sorry, your file is too large.";
+                        }
+                    } else {
+                        $photoError = "File is not an image.";
+                    }
+                }
+                
+                if(!isset($photoError)) {
+                    if(!isset($image)) {
+                        $image = "no-photo.png";
+                    }
+                    $sql = "INSERT INTO posts(post_title, post_author, post_category, post_image, post_tags, post_content) ";
+                    $sql .= "VALUES(?, ?, ?, ?, ?, ?)";
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute([$title, $author, $category, $image, $tags, $content]);
+                    echo "<h3 style='color: green;'>Post was published succesfully!</h3>";
+                } else {
+                    $alert = "<p style='color: red;'>".$photoError."</p>";
+                    echo $alert;
+                }
+            }
+        }
+    }
+
+    // This method edits posts
+    function edit() {
+        if(isset($_POST["add_post"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $title = $_POST["title"];
+                $category = $_POST["category"];
+                $tags = $_POST["tags"];
+                $content = $_POST["content"];
+                $id = $_GET["post_id"];
+
+                // Photo Upload System
+            
+                $target_dir = $_SERVER['DOCUMENT_ROOT']."/cms/uploads/";
+                $target_file = $target_dir.basename($_FILES["image"]["name"]);
+                $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+                if (!empty($_FILES["image"]["name"])) {
+                    $checkPhoto = getimagesize($_FILES["image"]["tmp_name"]);
+                    if ($checkPhoto !== false) {
+                        if ($_FILES["image"]["size"] < 500000000) {
+                            if ($fileType == "jpg" || $fileType == "jpeg" || $fileType == "png") {
+                                if (!file_exists($target_file)) {
+                                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                                    $image = basename($_FILES["image"]["name"]);
+                                    } else {
+                                    $photoError = "Sorry, there was an error uploading your file.";
+                                    }
+                                } else {
+                                    $image = basename($_FILES["image"]["name"]);
+                                }
+                            } else {
+                                $photoError = "Sorry, only JPG, JPEG & PNG files are allowed.";
+                            }
+                        } else {
+                            $photoError = "Sorry, your file is too large.";
+                        }
+                    } else {
+                        $photoError = "File is not an image.";
+                    }
+                }
+
+                if(!isset($photoError)) {
+                    $query = "UPDATE posts SET post_title=:title, post_category=:category, ";
+                    if(isset($image)) {
+                        $query .= "post_image=:image, ";
+                    }
+                    $query .= "post_tags=:tags, post_content=:content ";
+                    $query .= "WHERE post_id=:id";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindParam(':title', $title);
+                    $stmt->bindParam(':category', $category);
+                    $stmt->bindParam(':tags', $tags);
+                    $stmt->bindParam(':content', $content);
+                    $stmt->bindParam(':id', $id);
+                    if(isset($image)) {
+                        $stmt->bindParam(':image', $image);
+                    }
+                    $stmt->execute();
+                    echo "<h3 style='color: green;'>Post was editted succesfully!</h3>";
+                }
+            }
+        }
+    }
+
+    function data($id) {
+        $sql = "SELECT post_title as title, post_category as category, post_image as image,
+        post_tags as tags, post_content as content FROM posts WHERE post_id=?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        $this->data = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // This method displays category options when adding or editing posts
+    function options() {
+        $sql = "SELECT cat_title FROM categories";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $options = $stmt->fetchAll();
+        foreach ($options as $option) {
+            if($this->data["category"] == $option["cat_title"]) { ?>
+                <option value="<?=$option["cat_title"];?>" selected><?=$option["cat_title"];?></option>
+            <?php } else { ?>
+            <option value="<?=$option["cat_title"];?>"><?=$option["cat_title"];?></option>
+        <?php }
+        }
     }
 
     /* This method displays posts */
@@ -65,7 +212,7 @@ class Posts extends Connection {
                 <?php 
                 foreach ($post as $key => $value) { 
                     if($key == "image") { ?>
-                        <td><p><img width="120vw;" height="40vh;" src="/cms/uploads/<?php echo $value;?>" alt="Post image"></p></td>
+                        <td><p><img style="object-fit: cover;" width="120vw;" height="40vh;" src="/cms/uploads/<?php echo $value;?>" alt="Post image"></p></td>
                     <?php } elseif($key == "comments") { 
                         $post_id = $post["id"];
                         $query = "SELECT COUNT(comment_id) as count FROM comments WHERE post_id='$post_id'";

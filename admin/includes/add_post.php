@@ -1,4 +1,8 @@
-<?php addPost($_POST, $_FILES); ?>
+<?php 
+require_once("../database/posts.php");
+$posts = new Posts();
+$posts->insert();
+?>
 <form action="" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label for="title">Title</label>
@@ -7,7 +11,7 @@
     <div class="form-group">
         <label for="category">Category</label>
         <select name="category" class="form-control">
-            <?php displayOptions("null"); ?>
+            <?php $posts->options();?>
         </select>
     </div>
     <div class="form-group">
