@@ -5,9 +5,8 @@
 function displayPosts($startPostsFrom, $postPerPage) {
     openConn();
     global $conn;
-    $sql = "SELECT post_id as id, post_author as author, post_title as title, post_category_id as category, 
+    $sql = "SELECT post_id as id, post_author as author, post_title as title, post_category as category, 
     post_image as image, post_tags as tags, post_views as views, post_comment_count as comments, post_date as date FROM posts ORDER BY post_date DESC LIMIT {$startPostsFrom}, {$postPerPage}";
-    $row = $conn->query($sql);
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -20,7 +19,7 @@ function displayPosts($startPostsFrom, $postPerPage) {
                     <td><p><img width="120vw;" height="40vh;" src="/cms/uploads/<?php echo $value;?>" alt="Post image"></p></td>
                 <?php } elseif($key == "comments") { 
                     $post_id = $post["id"];
-                    $query = "SELECT COUNT(id) as count FROM comments WHERE post_id='$post_id'";
+                    $query = "SELECT COUNT(comment_id) as count FROM comments WHERE post_id='$post_id'";
                     $commentCount = $conn->prepare($query);
                     $commentCount->execute();
                     $count = $commentCount->fetch(PDO::FETCH_ASSOC);
@@ -64,8 +63,8 @@ function clonePost($post) {
             openConn();
             global $conn;
             $id = $post["post_id"];
-            $sql = "INSERT INTO posts(post_author, post_title, post_category_id, post_image, post_tags, post_comment_count, post_content) 
-            SELECT post_author, post_title, post_category_id, post_image, post_tags, post_comment_count, post_content FROM posts WHERE post_id={$id}";
+            $sql = "INSERT INTO posts(post_author, post_title, post_category, post_image, post_tags, post_comment_count, post_content) 
+            SELECT post_author, post_title, post_category, post_image, post_tags, post_comment_count, post_content FROM posts WHERE post_id={$id}";
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             return $conn = 0;
@@ -137,7 +136,7 @@ function addPost($post, $files) {
                 }
                 openConn();
                 global $conn;
-                $query = "INSERT INTO posts(post_title, post_author, post_category_id, post_image, post_tags, post_comment_count, post_content) ";
+                $query = "INSERT INTO posts(post_title, post_author, post_category, post_image, post_tags, post_comment_count, post_content) ";
                 $query .= "VALUES('$title', '$author', '$category', '$image', '$tags', '4', '$content')";
                 $conn->exec($query);
                 echo "<h3 style='color: green;'>Post was published succesfully!</h3>";
@@ -192,7 +191,7 @@ function editPost($post, $files, $id) {
             }
 
             if(!isset($photoError)) {
-                $query = "UPDATE posts SET post_title='$title', post_category_id='$category', ";
+                $query = "UPDATE posts SET post_title='$title', post_category='$category', ";
                 if(isset($image)) {
                     $query .= "post_image='$image', ";
                 }

@@ -52,6 +52,59 @@ class Posts extends Connection {
         return $this->array = $stmt->fetchAll();
     }
 
+    // This method displays posts table in admin panel
+    function table() {
+        $this->perPage = 8;
+        $sql = "SELECT post_id as id, post_author as author, post_title as title, post_category as category, 
+        post_image as image, post_tags as tags, post_views as views, post_comment_count as comments, post_date as date FROM posts ORDER BY post_date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $posts = $stmt->fetchAll();
+        foreach ($posts as $post) { ?>
+            <tr>
+                <?php 
+                foreach ($post as $key => $value) { 
+                    if($key == "image") { ?>
+                        <td><p><img width="120vw;" height="40vh;" src="/cms/uploads/<?php echo $value;?>" alt="Post image"></p></td>
+                    <?php } elseif($key == "comments") { 
+                        $post_id = $post["id"];
+                        $query = "SELECT COUNT(comment_id) as count FROM comments WHERE post_id='$post_id'";
+                        $commentCount = $this->conn->prepare($query);
+                        $commentCount->execute();
+                        $count = $commentCount->fetch(PDO::FETCH_ASSOC);
+                        ?>
+                        <td><?php echo $count["count"];?></td>
+                    <?php } elseif($key == "title") { ?>
+                        <td><p><a href="/cms/post.php?post_id=<?=$post["id"]?>"><?=$value?></a></p></td>
+                    <?php } elseif($key == "author") { ?>
+                        <td><p><a href="/cms/author.php?author=<?=$post["author"]?>"><?=$value?></a></p></td>
+                    <?php } elseif($key == "category") { ?>
+                        <td><p><a href="/cms/category.php?category_title=<?=$post["category"]?>"><?=$value?></a></p></td>
+                    <?php } else { ?>
+                        <td><p><?php echo $value;?></p></td>
+                    <?php }
+                } 
+                if($_SESSION["role"] === "Admin" || $_SESSION["role"] === "Moderator") { ?>
+                    <td style="width: 6%;">
+                        <button><a style="color: black;" href="posts.php?action=edit&post_id=<?php echo $post['id'];?>"><i class="far fa-edit"></i> Edit</a></button>
+                    </td>
+                    <td style="width: 6%;">
+                        <form action="" method="post">
+                            <input type="hidden" name="post_id" value="<?php echo $post['id'];?>">
+                            <button name="clone_post" onclick="javascript: return confirm('Are you sure you want to clone this post?');" type="submit"><i class="far fa-copy"></i> Clone</button>
+                        </form>
+                    </td>
+                    <td style="width: 6%;">
+                        <form action="" method="post">
+                            <input type="hidden" name="post_id" value="<?php echo $post['id'];?>">
+                            <button name="delete_post" onclick="javascript: return confirm('Are you sure you want to delete this post?');" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
+                        </form>
+                    </td>
+                <?php } ?>
+            </tr>
+        <?php }
+    }
+
     /* This method counts how many times each post was viewed */
     function updateViews($views, $id) {
         $viewSQL = "UPDATE posts SET post_views=? WHERE post_id=?";
