@@ -2,6 +2,7 @@
 require_once("conn.php");
 
 Class Categories extends Connection {
+    /* Properties for Categories */
     public $array;
 
     /* Opening Database Connection */
@@ -9,7 +10,7 @@ Class Categories extends Connection {
         $this->openConn();
     }
 
-    // This method counts total amount of comments
+    // This method counts total amount of categories
     function count() {
         $sql = "SELECT COUNT(id) as count FROM categories";
         $stmt = $this->conn->prepare($sql);
@@ -101,7 +102,7 @@ Class Categories extends Connection {
         <?php }
     }
 
-    /* This method deletes user */
+    /* This method deletes category */
     function delete() {
         if(isset($_POST["delete_category"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {

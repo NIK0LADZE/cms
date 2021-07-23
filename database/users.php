@@ -92,7 +92,7 @@ Class Users extends Connection {
         <?php }
     }
 
-    // This method counts total amount of comments
+    // This method counts total amount of users
     function count() {
         $sql = "SELECT COUNT(id) as count FROM users";
         $stmt = $this->conn->prepare($sql);
@@ -110,7 +110,7 @@ Class Users extends Connection {
         return $count["count"];
     }
 
-    /* This method counts how many posts are on different pages and applies it to pagination */
+    /* This method counts how many users are on each page in admin panel(users section) and applies it to pagination */
     function perPage() {
         $countSQL = "SELECT COUNT(id) as count FROM users";
         $stmt = $this->conn->prepare($countSQL);

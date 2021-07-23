@@ -2,6 +2,7 @@
 require_once("conn.php");
 
 class Comments extends Connection {
+    /* Properties for Comments */
     public $array;
     public $perPage = 10;
     public $startFrom;
@@ -81,7 +82,7 @@ class Comments extends Connection {
         }
     }
 
-    /* This method counts how many posts are on different pages and applies it to pagination */
+    /* This method counts how many comments are on each page in admin panel(comments section) and applies it to pagination */
     function perPage() {
         $countSQL = "SELECT COUNT(id) as count FROM comments";
         $stmt = $this->conn->prepare($countSQL);
@@ -106,6 +107,7 @@ class Comments extends Connection {
         }
     }
 
+    /* Closing Database Connection */
     function __destruct() {
         $this->conn = 0;
     }
