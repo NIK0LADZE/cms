@@ -80,7 +80,7 @@ Class Categories extends Connection {
             <tr>
                 <td><p><?php echo $cat['id'];?></p></td>
                 <td id="title">
-                    <p id="<?php echo $cat['title'];?>"><a href="/cms/category.php?category_title=<?=$cat['title']?>"><?=$cat['title']?></a></p>
+                    <p id="<?php echo $cat['title'];?>"><a href="/cms/category.php?category=<?=$cat['title']?>"><?=$cat['title']?></a></p>
                     <form action="" method="post">
                         <input type="hidden" name="old" value="<?php echo $cat['title'];?>">
                         <input type="hidden" name="new" class="edit" id="<?php echo $cat['title'].'_for_input';?>" value="<?php echo $cat['title'];?>">
