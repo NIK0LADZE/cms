@@ -27,16 +27,13 @@
                             </li>
                         </ol>
                         <?php
-                        openConn();
+                        require_once("../database/users.php");
+                        $users = new Users();
                         $id = $_SESSION["id"];
-                        $query = "SELECT id, username, fname, lname, bdate, email, image FROM users WHERE id='$id' LIMIT 1";
-                        $stmt = $conn->prepare($query);
-                        $stmt->execute();
-                        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $conn = 0;
+                        $users->data($id);
                         ?>
                         <div style="display: flex; justify-content: center; width: 100%; margin: 30px 0;">
-                            <img style="border-radius: 50%; " src="/cms/uploads/users/<?php echo $userData["image"];?>" width="300px" height="300px" alt="User Photo">
+                            <img style="border-radius: 50%; " src="/cms/uploads/users/<?php echo $users->data["image"];?>" width="300px" height="300px" alt="User Photo">
                         </div>
                         <?php 
                         if(isset($_GET["success"])) {
@@ -44,23 +41,23 @@
                         }
                         ?>
                         <form action="/cms/actions/edit_user.php" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="id" value="<?php echo $userData["id"];?>">
+                            <input type="hidden" name="id" value="<?php echo $users->data["id"];?>">
                             <div class="form-group">
                                 <label for="username">Username</label>
                                 <?php 
                                 if(isset($_GET["usernameError"])) { ?>
                                 <span style="color: red;">* <?php echo $_GET["usernameError"];?></span>
                                 <?php } ?>
-                                <input type="hidden" name="current-username" value="<?php echo $userData["username"];?>">
-                                <input type="text" class="form-control" name="username" value="<?php echo $userData["username"];?>" required>
+                                <input type="hidden" name="current-username" value="<?php echo $users->data["username"];?>">
+                                <input type="text" class="form-control" name="username" value="<?php echo $users->data["username"];?>" required>
                             </div>
                             <div class="form-group">
                                 <label for="fname">First name</label>
-                                <input type="text" class="form-control" name="fname" value="<?php echo $userData["fname"];?>">
+                                <input type="text" class="form-control" name="fname" value="<?php echo $users->data["fname"];?>">
                             </div>
                             <div class="form-group">
                                 <label for="lname">Last name</label>
-                                <input type="text" class="form-control" name="lname" value="<?php echo $userData["lname"];?>">
+                                <input type="text" class="form-control" name="lname" value="<?php echo $users->data["lname"];?>">
                             </div>
                             <div class="form-group">
                                 <label for="oldpass">Old password</label>
@@ -88,7 +85,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="bdate">Date of birth</label>
-                                <input type="date" class="form-control" name="bdate" value="<?php echo $userData["bdate"];?>">
+                                <input type="date" class="form-control" name="bdate" value="<?php echo $users->data["bdate"];?>">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email address</label>
@@ -96,7 +93,7 @@
                                 if(isset($_GET["emailError"])) { ?>
                                 <span style="color: red;">* <?php echo $_GET["emailError"];?></span>
                                 <?php } ?>
-                                <input type="email" class="form-control" name="email" value="<?php echo $userData["email"];?>">
+                                <input type="email" class="form-control" name="email" value="<?php echo $users->data["email"];?>">
                             </div>
                             <div class="form-group">
                                 <label for="image">Image</label>

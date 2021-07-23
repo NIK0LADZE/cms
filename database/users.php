@@ -3,6 +3,7 @@ require_once("conn.php");
 
 Class Users extends Connection {
     /* Properties for Users */
+    public $data;
     public $array;
     public $perPage = 10;
     public $startPostsFrom;
@@ -107,7 +108,7 @@ Class Users extends Connection {
                 $stmt->execute([$username]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if($username === $user["username"] && password_verify($password, $user["password"])) {
-                    $_SESSION["id"] = $user["id"];
+                    $_SESSION["id"] = $user["user_id"];
                     $_SESSION["username"] = $user["username"];
                     $_SESSION["fname"] = $user["fname"];
                     $_SESSION["lname"] = $user["lname"];
@@ -130,10 +131,11 @@ Class Users extends Connection {
         }
     }
 
-    function checkUsername($username, &$errArr) {
-        $query = "SELECT username FROM users WHERE username=? LIMIT 1";
+    // Checks if username is free
+    function checkUsername($username, &$errArr, $id = 0) {
+        $query = "SELECT username FROM users WHERE username=? AND NOT user_id=? LIMIT 1";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([$username]);
+        $stmt->execute([$username, $id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($stmt->rowCount()) {
@@ -146,10 +148,11 @@ Class Users extends Connection {
         }
     }
 
-    function checkEmail($email, &$errArr) {
-        $query = "SELECT email FROM users WHERE email=? LIMIT 1";
+    // Checks if email is free
+    function checkEmail($email, &$errArr, $id = 0) {
+        $query = "SELECT email FROM users WHERE email=? AND NOT user_id=? LIMIT 1";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([$email]);
+        $stmt->execute([$email, $id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($stmt->rowCount()) {
@@ -162,6 +165,7 @@ Class Users extends Connection {
         }
     }
 
+    // This method registers user
     function register() {
         if(isset($_POST["sign_up"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -244,6 +248,151 @@ Class Users extends Connection {
                 } else {
                     $link = "sign-up.php?".http_build_query($errArr)."&".http_build_query($succArr);
                     return header("Location: ../$link");
+                }
+            }
+        }
+    }
+
+    // This method sends data in user profile page
+    function data($id) {
+        $query = "SELECT user_id as id, username, fname, lname, bdate, email, image FROM users WHERE user_id=? LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$id]);
+        $this->data = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // This method validates password when user tries to change it
+    function checkPass($oldpass, $id) {
+        $sql = "SELECT password FROM users WHERE user_id=? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if(password_verify($oldpass, $result["password"])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // This method edits user data
+    function edit() {
+        if(isset($_POST["update_user"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $errArr = [];
+                $id = $_POST["id"];
+                $fname= $_POST["fname"];
+                $lname= $_POST["lname"];
+                $bdate = $_POST["bdate"];
+
+                if($this->checkUsername($_POST["username"], $errArr, $_POST["id"])) {
+                    $username = $_POST["username"];
+                }
+
+                if($this->checkEmail($_POST["email"], $errArr, $_POST["id"])) {
+                    $email = $_POST["email"];
+                }
+
+                if(!empty($_POST["oldpass"])) {
+                    if($this->checkPass($_POST["oldpass"], $_POST["id"])) {
+                        if (strlen($_POST["newpass"]) < 8) {
+                            $errArr["passError"] = "Password must be at least 8 characters in length";
+                        } elseif (!preg_match("/^\S*(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/", $_POST["newpass"])) {
+                            $errArr["passError"] = "Password must include one uppercase, lowercase and special characters";
+                        } else {
+                            if($_POST["newpass"] === $_POST["verifynewpass"]) {
+                                $password = password_hash($_POST["newpass"], PASSWORD_DEFAULT);
+                            } else {
+                                $errArr["verifyPassError"] = "Passwords don't match";
+                            }
+                        }
+                    } else {
+                        $errArr["oldPassError"] = "Old password is incorrect!";
+                    }
+                }
+
+                // Photo Upload System
+
+                $target_dir = $_SERVER['DOCUMENT_ROOT']."/cms/uploads/users/";
+                $target_file = $target_dir.basename($_FILES["image"]["name"]);
+                $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                
+                if (!empty($_FILES["image"]["name"])) {
+                    $checkPhoto = getimagesize($_FILES["image"]["tmp_name"]);
+                    if ($checkPhoto !== false) {
+                        if ($_FILES["image"]["size"] < 500000000) {
+                            if ($fileType == "jpg" || $fileType == "jpeg" || $fileType == "png") {
+                                if (!file_exists($target_file)) {
+                                    if(count($errArr) == 0) {
+                                        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                                        $image = basename($_FILES["image"]["name"]);
+                                        } else {
+                                        $errArr["photoError"] = "Sorry, there was an error uploading your file.";
+                                        }
+                                    }
+                                } else {
+                                    $image = basename($_FILES["image"]["name"]);
+                                }
+                            } else {
+                                $errArr["photoError"] = "Sorry, only JPG, JPEG & PNG files are allowed.";
+                            }
+                        } else {
+                            $errArr["photoError"] = "Sorry, your file is too large.";
+                        }
+                    } else {
+                        $errArr["photoError"] = "File is not an image.";
+                    }
+                }
+
+                if(count($errArr) == 0) {
+                    $currentUsername = $_POST["current-username"];
+                    // Checks if username is changed updates posts and comments with that username
+                    if($currentUsername !== $username) {
+                        $query = "UPDATE posts, comments SET posts.post_author=?, comments.comment_author=? WHERE posts.post_author=? AND comments.comment_author=?";
+                        $update = $this->conn->prepare($query);
+                        $update->execute([$username, $username, $currentUsername, $currentUsername]);
+                    }
+                    $sql = "UPDATE users SET fname=:fname, lname=:lname, ";
+                    if(isset($username)) {
+                        $sql .= "username=:username, ";
+                    }
+                    if(isset($password)) {
+                        $sql .= "password=:password, ";
+                    }
+                    if(isset($email)) {
+                        $sql .= "email=:email, ";
+                    }
+                    if(isset($image)) {
+                        $sql .= "image=:image, ";
+                    }
+                    $sql .= "bdate=:bdate WHERE user_id=:id;";
+                    $stmt = $this->conn->prepare($sql);
+
+                    if(isset($username)) {
+                        $stmt->bindParam(':username', $username);
+                        $_SESSION["username"] = $username;
+                    }
+                    if(isset($password)) {
+                        $stmt->bindParam(':password', $password);
+                    }
+                    if(isset($email)) {
+                        $stmt->bindParam(':email', $email);
+                    }
+                    if(isset($image)) {
+                        $stmt->bindParam(':image', $image);
+                    }
+                    $stmt->bindParam(':fname', $fname);
+                    $_SESSION["fname"] = $fname;
+                    $stmt->bindParam(':lname', $lname);
+                    $_SESSION["lname"] = $lname;
+                    $stmt->bindParam(':bdate', $bdate);
+                    $stmt->bindParam(':id', $id);
+                    $stmt->execute();
+                    $link = "profile.php?success=Information was updated successfully!";
+                    return header("Location: /cms/admin/$link");
+                } else {
+                    $link = "profile.php?".http_build_query($errArr);
+                    return header("Location: /cms/admin/$link");
                 }
             }
         }
