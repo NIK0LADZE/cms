@@ -77,8 +77,8 @@
                         require_once("database/comments.php");
                         $post_id = $_GET["post_id"];
                         $comments = new Comments();
-                        $comments = $comments->display($post_id);
-                        foreach ($comments as $comment) { ?>
+                        $comments->display($post_id);
+                        foreach ($comments->array as $comment) { ?>
                         <div class="media">
                             <a class="pull-left" href="#">
                                 <img class="media-object" width="64px" height="64px" src="/cms/uploads/users/<?php

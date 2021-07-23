@@ -27,50 +27,28 @@
                             </li>
                         </ol>
                         <?php 
-                        if(isset($_POST["delete_comment"])) {
-                            delete("comments", $_POST["comment_id"]);
-                        }
-                        ?>
-                        <?php 
-                        openConn();
-                        $postPerPage = 10;
-                        $countSQL = "SELECT COUNT(id) as count FROM comments";
-                        $stmt = $conn->prepare($countSQL);
-                        $stmt->execute();
-                        $postCount = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $postCount = $postCount["count"];
-                        $pagerCount = ceil($postCount / $postPerPage); 
-                        if(isset($_GET["page"])) {
-                            if($_GET["page"] == 1) {
-                                $page = 1;
-                                $startPostsFrom = 0;
-                            } elseif($_GET["page"] == 0 || $_GET["page"] > $pagerCount || empty($_GET["page"])) {
-                                echo "<h1>This page doesn't exist.</h1>";
-                                return 0;
-                            } else {
-                                $page = $_GET["page"];
-                                $startPostsFrom = ($page - 1) * $postPerPage;
-                            }
-                        } else {
-                            $page = 1;
-                            $startPostsFrom = 0;
+                        require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/comments.php");
+                        $comments = new Comments();
+                        $comments->delete();
+                        $comments->perPage();
+                        if(isset($comments->startFrom)) { ?>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Author</th>
+                                        <th>On Post</th>
+                                        <th>Content</th>
+                                        <th colspan=3>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $comments->table(); ?>
+                                </tbody>
+                            </table>
+                            <!-- Pager  -->
+                            <?php pager("comments.php?", $comments->page, $comments->pagerCount);
                         } ?>
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Author</th>
-                                    <th>On Post</th>
-                                    <th>Content</th>
-                                    <th colspan=3>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php displayComments($startPostsFrom, $postPerPage);?>
-                            </tbody>
-                        </table>
-                        <!-- Pager  -->
-                        <?php pager("comments.php?", $page, $pagerCount);?>
                     </div>
                 </div>
                 <!-- /.row -->
