@@ -3,7 +3,6 @@ require_once("conn.php");
 
 Class Categories extends Connection {
     public $categories;
-    public $count;
 
     /* Opening Database Connection */
     function __construct() {
@@ -11,12 +10,12 @@ Class Categories extends Connection {
     }
 
     // This method counts total amount of comments
-    function countCategories() {
+    function count() {
         $sql = "SELECT COUNT(id) as count FROM categories";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo $this->count = $count["count"];
+        echo $count["count"];
     }
 
     /* This method checks if category really exists */

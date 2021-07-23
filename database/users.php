@@ -9,7 +9,6 @@ Class Users extends Connection {
     public $postCount;
     public $pagerCount;
     public $page;
-    public $count;
     
     /* Opening Database Connection */
     function __construct() {
@@ -94,12 +93,12 @@ Class Users extends Connection {
     }
 
     // This method counts total amount of comments
-    function countUsers() {
+    function count() {
         $sql = "SELECT COUNT(id) as count FROM users";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo $this->count = $count["count"];
+        echo $count["count"];
     }
 
     /* This method checks if user really exists */

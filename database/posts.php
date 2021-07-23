@@ -9,7 +9,6 @@ class Posts extends Connection {
     public $postCount;
     public $pagerCount;
     public $page;
-    public $count;
 
     /* Opening Database Connection */
     function __construct() {
@@ -17,12 +16,12 @@ class Posts extends Connection {
     }
 
     /* This method counts total amount of posts */
-    function countPosts() {
+    function count() {
         $sql = "SELECT COUNT(post_id) as count FROM posts";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo $this->count = $count["count"];
+        echo $count["count"];
     }
 
     /* This method displays posts */

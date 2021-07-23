@@ -8,7 +8,6 @@ class Comments extends Connection {
     public $commentCount;
     public $pagerCount;
     public $page;
-    public $count;
 
     /* Opening Database Connection */
     function __construct() {
@@ -16,12 +15,12 @@ class Comments extends Connection {
     }
 
     // This method counts total amount of comments
-    function countComments() {
+    function count() {
         $sql = "SELECT COUNT(id) as count FROM comments";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo $this->count = $count["count"];
+        echo $count["count"];
     }
 
     // This method displays comments for posts

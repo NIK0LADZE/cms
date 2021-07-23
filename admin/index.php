@@ -43,7 +43,7 @@
                                             // Counts Posts
                                             require_once("../database/posts.php");
                                             $posts = new Posts();
-                                            $posts->countPosts();
+                                            $posts->count();
                                             ?>
                                         </div>
                                         <div>Posts</div>
@@ -72,7 +72,7 @@
                                             // Counts Comments
                                             require_once("../database/comments.php");
                                             $comments = new Comments();
-                                            $comments->countComments();
+                                            $comments->count();
                                             ?>
                                         </div>
                                         <div>Comments</div>
@@ -101,7 +101,7 @@
                                             // Counts Users
                                             require_once("../database/users.php");
                                             $users = new Users();
-                                            $users->countUsers();
+                                            $users->count();
                                             ?>
                                         </div>
                                         <div> Users</div>
@@ -130,7 +130,7 @@
                                             // Counts Categories
                                             require_once("../database/categories.php");
                                             $categories = new Categories();
-                                            $categories->countCategories();
+                                            $categories->count();
                                             ?>
                                         </div>
                                         <div>Categories</div>
@@ -158,10 +158,10 @@
                         function drawChart() {
                             var data = google.visualization.arrayToDataTable([
                             ['Element', 'Amount', { role: 'style' }],
-                            ['Posts', <?php $posts->countPosts();?>, 'color: blue; opacity: 0.75'],
-                            ['Comments', <?php $comments->countComments();?>, 'color: green; opacity: 0.75'],
-                            ['Users', <?php $users->countUsers();?>, 'color: orange; opacity: 0.75'],
-                            ['Categories', <?php $categories->countCategories();;?>, 'color: red; opacity: 0.75']
+                            ['Posts', <?php $posts->count();?>, 'color: blue; opacity: 0.75'],
+                            ['Comments', <?php $comments->count();?>, 'color: green; opacity: 0.75'],
+                            ['Users', <?php $users->count();?>, 'color: orange; opacity: 0.75'],
+                            ['Categories', <?php $categories->count();;?>, 'color: red; opacity: 0.75']
                             ]);
 
                             var options = {
