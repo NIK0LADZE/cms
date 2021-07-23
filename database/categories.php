@@ -48,6 +48,7 @@ Class Categories extends Connection {
         }
     }
 
+    /* This method edits category title */
     function update() {
         if(isset($_POST["new"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -73,6 +74,34 @@ Class Categories extends Connection {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->array = $stmt->fetchAll();
+    }
+
+    /* This method displays categories table in admin panel */
+    function table() {
+        $this->display();
+        foreach ($this->array as $cat) { ?>
+            <tr>
+                <td><p><?php echo $cat['id'];?></p></td>
+                <td id="title">
+                    <p id="<?php echo $cat['title'];?>"><a href="/cms/category.php?category_title=<?=$cat['title']?>"><?=$cat['title']?></a></p>
+                    <form action="" method="post">
+                        <input type="hidden" name="old" value="<?php echo $cat['title'];?>">
+                        <input type="hidden" name="new" class="edit" id="<?php echo $cat['title'].'_for_input';?>" value="<?php echo $cat['title'];?>">
+                    </form>
+                </td>
+                <?php if($_SESSION["role"] === "Admin" || $_SESSION["role"] === "Moderator") { ?>
+                    <td style="width: 10%; text-align: center;">
+                        <button onclick="document.getElementById('<?php echo $cat['title'];?>').style.display = 'none'; document.getElementById('<?php echo $cat['title'];?>_for_input').setAttribute('type', 'text');" name="edit" type="submit"><i class="far fa-edit"></i> Edit</button>
+                    </td>
+                    <td style="width: 12%; text-align: center;">
+                        <form id="delete" action="" method="post">
+                            <input type="hidden" name="cat_id" value="<?php echo $cat['id'];?>">
+                            <button name="delete_category" onclick="javascript: return confirm('Are you sure you want to delete this category?');" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
+                        </form>
+                    </td>
+                <?php } ?>
+            </tr>
+        <?php }
     }
 
     /* This method deletes user */
