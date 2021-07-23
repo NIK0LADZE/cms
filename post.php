@@ -77,7 +77,7 @@
                         require_once("database/comments.php");
                         $post_id = $_GET["post_id"];
                         $comments = new Comments();
-                        $comments->display($post_id);
+                        $comments->display();
                         foreach ($comments->array as $comment) { ?>
                         <div class="media">
                             <a class="pull-left" href="#">
