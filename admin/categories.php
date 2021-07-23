@@ -61,7 +61,7 @@ $categories->display();
                                 </thead>
                                 <tbody>
                                     <?php 
-                                    foreach ($categories->categories as $cat) { ?>
+                                    foreach ($categories->array as $cat) { ?>
                                         <tr>
                                             <td><p><?php echo $cat['id'];?></p></td>
                                             <td id="title">

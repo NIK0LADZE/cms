@@ -2,7 +2,7 @@
 require_once("conn.php");
 
 Class Categories extends Connection {
-    public $categories;
+    public $array;
 
     /* Opening Database Connection */
     function __construct() {
@@ -72,7 +72,7 @@ Class Categories extends Connection {
         $sql = "SELECT id, cat_title as title FROM categories";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
-        $this->categories = $stmt->fetchAll();
+        $this->array = $stmt->fetchAll();
     }
 
     /* This method deletes user */

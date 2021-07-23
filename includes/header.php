@@ -52,7 +52,7 @@
                     require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/categories.php");
                     $categories = new Categories();
                     $categories->display(); 
-                    $categories = $categories->categories; 
+                    $categories = $categories->array; 
                     foreach ($categories as $key => $category) {
                         echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
                     }
