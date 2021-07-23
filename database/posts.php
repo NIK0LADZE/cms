@@ -105,6 +105,34 @@ class Posts extends Connection {
         <?php }
     }
 
+    // This method clones posts
+    function clone() {
+        if(isset($_POST["clone_post"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $id = $_POST["post_id"];
+                $sql = "INSERT INTO posts(post_author, post_title, post_category, post_image, post_tags, post_comment_count, post_content) 
+                SELECT post_author, post_title, post_category, post_image, post_tags, post_comment_count, post_content FROM posts WHERE post_id=?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$id]);
+            }
+        }
+    }
+
+    // This method deletes posts and comments related to that post
+    function delete() {
+        if(isset($_POST["delete_post"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $id = $_POST["post_id"];
+                $sql = "DELETE posts, comments 
+                FROM posts
+                LEFT JOIN comments ON posts.post_id=comments.post_id
+                WHERE posts.post_id=?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$id]);
+            }
+        }
+    }
+
     /* This method counts how many times each post was viewed */
     function updateViews($views, $id) {
         $viewSQL = "UPDATE posts SET post_views=? WHERE post_id=?";

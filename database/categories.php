@@ -119,7 +119,7 @@ Class Categories extends Connection {
                 FROM categories 
                 LEFT JOIN posts ON categories.cat_title=posts.post_category
                 LEFT JOIN comments ON posts.post_id=comments.post_id
-                WHERE cat_id=?";
+                WHERE categories.cat_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
             }
