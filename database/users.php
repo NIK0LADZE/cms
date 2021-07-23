@@ -6,7 +6,7 @@ Class Users extends Connection {
     public $array;
     public $perPage = 10;
     public $startPostsFrom;
-    public $postCount;
+    public $userCount;
     public $pagerCount;
     public $page;
     
@@ -116,9 +116,9 @@ Class Users extends Connection {
         $stmt = $this->conn->prepare($countSQL);
         $stmt->execute();
         // Calculates diapason of posts which should be shown on each page
-        $this->postCount = $stmt->fetch(PDO::FETCH_ASSOC);
-        $this->postCount = $this->postCount["count"];
-        $this->pagerCount = ceil($this->postCount / $this->perPage); 
+        $this->userCount = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->userCount = $this->userCount["count"];
+        $this->pagerCount = ceil($this->userCount / $this->perPage); 
         if(isset($_GET["page"])) {
             if($_GET["page"] == 1) {
                 $this->page = 1;
