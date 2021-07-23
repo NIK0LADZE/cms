@@ -45,7 +45,7 @@ Class Users extends Connection {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $id = $_POST["set_role"];
                 $role = $_POST["role_for_user_".$id];
-                $sql = "UPDATE users SET role=? WHERE id=?";
+                $sql = "UPDATE users SET role=? WHERE user_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$role, $id]);
             }
@@ -54,7 +54,7 @@ Class Users extends Connection {
 
     /* This method displays users */
     function display() {
-        $sql = "SELECT id, username, fname, lname, bdate, email, image, role FROM users ORDER BY id DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
+        $sql = "SELECT user_id as id, username, fname, lname, bdate, email, image, role FROM users ORDER BY id DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->array = $stmt->fetchAll();
@@ -94,7 +94,7 @@ Class Users extends Connection {
 
     // This method counts total amount of users
     function count() {
-        $sql = "SELECT COUNT(id) as count FROM users";
+        $sql = "SELECT COUNT(user_id) as count FROM users";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -112,7 +112,7 @@ Class Users extends Connection {
 
     /* This method counts how many users are on each page in admin panel(users section) and applies it to pagination */
     function perPage() {
-        $countSQL = "SELECT COUNT(id) as count FROM users";
+        $countSQL = "SELECT COUNT(user_id) as count FROM users";
         $stmt = $this->conn->prepare($countSQL);
         $stmt->execute();
         // Calculates diapason of posts which should be shown on each page

@@ -12,7 +12,7 @@ Class Categories extends Connection {
 
     // This method counts total amount of categories
     function count() {
-        $sql = "SELECT COUNT(id) as count FROM categories";
+        $sql = "SELECT COUNT(cat_id) as count FROM categories";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);

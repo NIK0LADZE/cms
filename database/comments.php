@@ -17,7 +17,7 @@ class Comments extends Connection {
 
     // This method counts total amount of comments
     function count() {
-        $sql = "SELECT COUNT(id) as count FROM comments";
+        $sql = "SELECT COUNT(comment_id) as count FROM comments";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -35,7 +35,7 @@ class Comments extends Connection {
 
     // This method displays comments table in admin panel
     function table() {
-        $sql = "SELECT comments.id, posts.post_id as post_id, comments.comment_author as author, posts.post_title as title, comments.comment_content as content, comments.comment_date as date FROM comments INNER JOIN posts ON comments.post_id=posts.post_id ORDER BY comments.comment_date DESC LIMIT {$this->startFrom}, {$this->perPage}";
+        $sql = "SELECT comments.comment_id as id, posts.post_id as post_id, comments.comment_author as author, posts.post_title as title, comments.comment_content as content, comments.comment_date as date FROM comments INNER JOIN posts ON comments.post_id=posts.post_id ORDER BY comments.comment_date DESC LIMIT {$this->startFrom}, {$this->perPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $comments = $stmt->fetchAll();
@@ -75,7 +75,7 @@ class Comments extends Connection {
         if(isset($_POST["delete_comment"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $id = $_POST["comment_id"];
-                $sql = "DELETE FROM comments where id=?";
+                $sql = "DELETE FROM comments where comment_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
             }
@@ -84,7 +84,7 @@ class Comments extends Connection {
 
     /* This method counts how many comments are on each page in admin panel(comments section) and applies it to pagination */
     function perPage() {
-        $countSQL = "SELECT COUNT(id) as count FROM comments";
+        $countSQL = "SELECT COUNT(comment_id) as count FROM comments";
         $stmt = $this->conn->prepare($countSQL);
         $stmt->execute();
         // Calculates diapason of posts which should be shown on each page
