@@ -23,7 +23,7 @@ Class Users extends Connection {
                 $sql = "DELETE users, posts, comments
                 FROM users
                 LEFT JOIN posts ON users.username=posts.post_author
-                LEFT JOIN comments ON posts.post_id=comments.post_id
+                LEFT JOIN comments ON posts.post_id=comments.post_id OR users.username=comments.comment_author
                 WHERE user_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
