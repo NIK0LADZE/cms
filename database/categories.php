@@ -68,7 +68,7 @@ Class Categories extends Connection {
 
     /* This method displays categories */
     function display() {
-        $sql = "SELECT id, cat_title as title FROM categories";
+        $sql = "SELECT cat_id as id, cat_title as title FROM categories";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $this->array = $stmt->fetchAll();
@@ -102,12 +102,15 @@ Class Categories extends Connection {
         <?php }
     }
 
-    /* This method deletes category */
+    /* This method deletes category which also results deleting posts related to the category and comments related to posts */
     function delete() {
         if(isset($_POST["delete_category"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $id = $_POST["cat_id"];
-                $sql = "DELETE FROM categories where id=?";
+                $sql = "DELETE categories, posts, comments 
+                FROM categories 
+                INNER JOIN posts ON categories.cat_title=posts.post_category
+                INNER JOIN comments ON posts.post_id=comments.post_id where cat_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
             }
