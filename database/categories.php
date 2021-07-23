@@ -109,8 +109,8 @@ Class Categories extends Connection {
                 $id = $_POST["cat_id"];
                 $sql = "DELETE categories, posts, comments 
                 FROM categories 
-                INNER JOIN posts ON categories.cat_title=posts.post_category
-                INNER JOIN comments ON posts.post_id=comments.post_id where cat_id=?";
+                LEFT JOIN posts ON categories.cat_title=posts.post_category
+                LEFT JOIN comments ON posts.post_id=comments.post_id where cat_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
             }
