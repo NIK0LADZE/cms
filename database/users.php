@@ -23,7 +23,7 @@ Class Users extends Connection {
                 $sql = "DELETE users, posts, comments
                 FROM users
                 LEFT JOIN posts ON users.username=posts.post_author
-                LEFT JOIN comments ON posts.post_id=comments.post_id OR users.username=comments.comment_author
+                LEFT JOIN comments ON (posts.post_id=comments.post_id AND users.username=comments.comment_author) OR users.username=comments.comment_author
                 WHERE user_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
@@ -96,6 +96,7 @@ Class Users extends Connection {
         <?php }
     }
 
+    /* This method checks if user entered correct credentials and proceeds accordingly */
     function login() {
         if(isset($_POST["sign_in"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -124,6 +125,125 @@ Class Users extends Connection {
                         $link = $link[0]."&alert=$error";
                     }
                     header("Location: ".$link);
+                }
+            }
+        }
+    }
+
+    function checkUsername($username, &$errArr) {
+        $query = "SELECT username FROM users WHERE username=? LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$username]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if($stmt->rowCount()) {
+            if($result["username"] === $username) {
+                $errArr["usernameError"] = "This username already exists";
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    function checkEmail($email, &$errArr) {
+        $query = "SELECT email FROM users WHERE email=? LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$email]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if($stmt->rowCount()) {
+            if($result["email"] === $email) {
+                $errArr["emailError"] = "User with this email is already registered";
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    function register() {
+        if(isset($_POST["sign_up"])) {
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                
+                $errArr = [];
+                $succArr = [];
+                // Checks if Username is free
+                if($this->checkUsername($_POST["username"], $errArr)) {
+                    $succArr["username"] = $username = $_POST["username"];
+                }
+                $succArr["fname"] = $fname= $_POST["fname"];
+                $succArr["lname"] = $lname = $_POST["lname"];
+                // Checks if password is entered correctly
+                if (strlen($_POST["pass1"]) < 8) {
+                    $errArr["passError"] = "Password must be at least 8 characters in length";
+                } elseif (!preg_match("/^\S*(?=\S*[a-z])(?=\S*[\W])(?=\S*[A-Z])(?=\S*[\d])\S*$/", $_POST["pass1"])) {
+                    $errArr["passError"] = "Password must include one uppercase, lowercase and special characters";
+                } else {
+                    $pass1 = $_POST["pass1"];
+                }
+                $role = "Subscriber";
+                // Checks if passwords match
+                if(isset($pass1)) {
+                    if($_POST["pass2"] !== $pass1) {
+                        $errArr["verifyPassError"] = "Passwords don't match";
+                    } else {
+                        $password = password_hash($pass1, PASSWORD_DEFAULT);
+                    }
+                }
+                $succArr["bdate"] = $bdate = $_POST["bdate"];
+                // Checks if email is free
+                if($this->checkEmail($_POST["email"], $errArr)) {
+                    $succArr["email"] = $email = $_POST["email"];
+                }
+
+                // Photo Upload System
+
+                $target_dir = $_SERVER['DOCUMENT_ROOT']."/cms/uploads/users/";
+                $target_file = $target_dir.basename($_FILES["image"]["name"]);
+                $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                
+                if (!empty($_FILES["image"]["name"])) {
+                    $checkPhoto = getimagesize($_FILES["image"]["tmp_name"]);
+                    if ($checkPhoto !== false) {
+                        if ($_FILES["image"]["size"] < 500000000) {
+                            if ($fileType == "jpg" || $fileType == "jpeg" || $fileType == "png") {
+                                if (!file_exists($target_file)) {
+                                    if(count($errArr) == 0) {
+                                        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                                        $image = basename($_FILES["image"]["name"]);
+                                        } else {
+                                        $errArr["photoError"] = "Sorry, there was an error uploading your file.";
+                                        }
+                                    }
+                                } else {
+                                    $errArr["photoError"] = "Sorry, file already exists.";
+                                }
+                            } else {
+                                $errArr["photoError"] = "Sorry, only JPG, JPEG & PNG files are allowed.";
+                            }
+                        } else {
+                            $errArr["photoError"] = "Sorry, your file is too large.";
+                        }
+                    } else {
+                        $errArr["photoError"] = "File is not an image.";
+                    }
+                }
+                // Checks if user entered everything correctly and if so proceeds to register the user
+                if(count($errArr) == 0) {
+                    // If user didn't upload photo
+                    if(!isset($image)) {
+                        $image = "no-photo.png";
+                    }
+                    $sql = "INSERT INTO users(username, fname, lname, password, bdate, email, image, role) ";
+                    $sql .= "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute([$username, $fname, $lname, $password, $bdate, $email, $image, $role]);
+                    $link = "sign-up.php?success=Registration was successful!";
+                    return header("Location: ../$link");
+                } else {
+                    $link = "sign-up.php?".http_build_query($errArr)."&".http_build_query($succArr);
+                    return header("Location: ../$link");
                 }
             }
         }
