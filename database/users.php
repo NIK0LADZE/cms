@@ -348,9 +348,12 @@ Class Users extends Connection {
                     $currentUsername = $_POST["current-username"];
                     // Checks if username is changed updates posts and comments with that username
                     if($currentUsername !== $username) {
-                        $query = "UPDATE posts, comments SET posts.post_author=?, comments.comment_author=? WHERE posts.post_author=? AND comments.comment_author=?";
-                        $update = $this->conn->prepare($query);
-                        $update->execute([$username, $username, $currentUsername, $currentUsername]);
+                        $updatePosts = "UPDATE posts SET post_author=? WHERE post_author=?";
+                        $update = $this->conn->prepare($updatePosts);
+                        $update->execute([$username, $currentUsername]);
+                        $updateComments = "UPDATE comments SET comment_author=? WHERE comment_author=?";
+                        $update = $this->conn->prepare($updateComments);
+                        $update->execute([$username, $currentUsername]);
                     }
                     $sql = "UPDATE users SET fname=:fname, lname=:lname, ";
                     if(isset($username)) {

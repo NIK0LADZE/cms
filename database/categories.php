@@ -60,9 +60,12 @@ Class Categories extends Connection {
                     if($count == 1) {
                         echo "<p style='color: red; margin: 0;'>This category already exists</p>";
                     } else {
-                        $updateCat = "UPDATE categories, posts SET categories.cat_title=?, posts.post_category=? WHERE categories.cat_title=? AND posts.post_category=?";
+                        $updateCat = "UPDATE categories SET cat_title=? WHERE cat_title=?";
                         $updateCat = $this->conn->prepare($updateCat);
-                        $updateCat->execute([$newCatTitle, $newCatTitle, $oldCatTitle, $oldCatTitle]);
+                        $updateCat->execute([$newCatTitle, $oldCatTitle]);
+                        $updatePost = "UPDATE posts SET post_category=? WHERE post_category=?";
+                        $updatePost = $this->conn->prepare($updatePost);
+                        $updatePost->execute([$newCatTitle, $oldCatTitle]);
                     }
                 } else {
                     echo "<p style='text-align: center; color: red; margin: 0;'>New value shoud not be empty</p>";
