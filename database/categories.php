@@ -55,12 +55,9 @@ Class Categories extends Connection {
                 $oldCatTitle = $_POST["old"];
                 $newCatTitle = $_POST["new"];
                 if(!empty($newCatTitle)) {
-                    $updateCat = "UPDATE categories SET cat_title=? WHERE cat_title=?";
+                    $updateCat = "UPDATE categories, posts SET categories.cat_title=?, posts.post_category=? WHERE categories.cat_title=? AND posts.post_category=?";
                     $updateCat = $this->conn->prepare($updateCat);
-                    $updateCat->execute([$newCatTitle, $oldCatTitle]);
-                    $updatePosts = "UPDATE posts SET post_category=? WHERE post_category=?";
-                    $updatePosts = $this->conn->prepare($updatePosts);
-                    $updatePosts->execute([$newCatTitle, $oldCatTitle]);
+                    $updateCat->execute([$newCatTitle, $newCatTitle, $oldCatTitle, $oldCatTitle]);
                 } else {
                     echo "<p style='text-align: center; color: red; margin: 0;'>New value shoud not be empty</p>";
                 }
