@@ -75,7 +75,7 @@ class Comments extends Connection {
         if(isset($_POST["delete_comment"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $id = $_POST["comment_id"];
-                $sql = "DELETE FROM comments where comment_id=?";
+                $sql = "DELETE FROM comments WHERE comment_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
             }
