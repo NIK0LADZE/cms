@@ -64,7 +64,7 @@ Class Users extends Connection {
                 <?php 
                 foreach ($user as $key => $value) { 
                     if($key == "image") { ?>
-                        <td><p><img width="50px;" height="50px;" src="/cms/uploads/users/<?php echo $value;?>" alt="User image"></p></td>
+                        <td><p><img style="object-fit: cover;" width="50px;" height="50px;" src="/cms/uploads/users/<?php echo $value;?>" alt="User image"></p></td>
                     <?php } elseif($key == "role") { ?>
                         <td>
                             <?php if($_SESSION["role"] === "Admin") { ?>
