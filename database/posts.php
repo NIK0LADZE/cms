@@ -323,7 +323,8 @@ class Posts extends Connection {
         // Calculates diapason of posts which should be shown on each page
         $this->postCount = $stmt->fetch(PDO::FETCH_ASSOC);
         $this->postCount = $this->postCount["count"];
-        $this->pagerCount = ceil($this->postCount / $perPage); 
+        $this->perPage = $perPage;
+        $this->pagerCount = ceil($this->postCount / $this->perPage); 
         if(isset($_GET["page"])) {
             if($_GET["page"] == 1) {
                 $this->page = 1;
@@ -332,7 +333,7 @@ class Posts extends Connection {
                 echo "<h1>This page doesn't exist.</h1>";
             } else {
                 $this->page = $_GET["page"];
-                $this->startPostsFrom = ($this->page - 1) * $perPage;
+                $this->startPostsFrom = ($this->page - 1) * $this->perPage;
             }
         } else {
             $this->page = 1;

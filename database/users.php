@@ -5,7 +5,7 @@ Class Users extends Connection {
     /* Properties for Users */
     public $data;
     public $array;
-    public $perPage = 10;
+    public $perPage;
     public $startPostsFrom;
     public $userCount;
     public $pagerCount;
@@ -424,13 +424,14 @@ Class Users extends Connection {
     }
 
     /* This method counts how many users are on each page in admin panel(users section) and applies it to pagination */
-    function perPage() {
+    function perPage($perPage) {
         $countSQL = "SELECT COUNT(user_id) as count FROM users";
         $stmt = $this->conn->prepare($countSQL);
         $stmt->execute();
         // Calculates diapason of posts which should be shown on each page
         $this->userCount = $stmt->fetch(PDO::FETCH_ASSOC);
         $this->userCount = $this->userCount["count"];
+        $this->perPage = $perPage;
         $this->pagerCount = ceil($this->userCount / $this->perPage); 
         if(isset($_GET["page"])) {
             if($_GET["page"] == 1) {

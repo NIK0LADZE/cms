@@ -31,7 +31,7 @@
                         $users = new Users();
                         $users->setRole();
                         $users->delete();
-                        $users->perPage(1, 8);
+                        $users->perPage(8);
                         if(isset($users->startPostsFrom)) { ?>
                             <form action="" method="post">
                                 <table class="table table-bordered table-hover">
