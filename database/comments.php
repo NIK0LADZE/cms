@@ -26,8 +26,8 @@ class Comments extends Connection {
 
     // This method displays comments for posts
     function display() {
-        $sql = "SELECT users.image as photo, comments.comment_author as author, comments.comment_content as content, comments.comment_date as date 
-        FROM comments LEFT JOIN users ON comments.comment_author = users.username WHERE post_id=? ORDER BY date DESC";
+        $sql = "SELECT users.image as photo, users.username as author, comments.comment_content as content, comments.comment_date as date 
+        FROM comments INNER JOIN users ON comments.comment_author_id = users.user_id WHERE comments.post_id=? ORDER BY date DESC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$_GET["post_id"]]);
         $this->array = $stmt->fetchAll();
@@ -35,7 +35,10 @@ class Comments extends Connection {
 
     // This method displays comments table in admin panel
     function table() {
-        $sql = "SELECT comments.comment_id as id, posts.post_id as post_id, comments.comment_author as author, posts.post_title as title, comments.comment_content as content, comments.comment_date as date FROM comments INNER JOIN posts ON comments.post_id=posts.post_id ORDER BY comments.comment_date DESC LIMIT {$this->startFrom}, {$this->perPage}";
+        $sql = "SELECT comments.comment_id as id, posts.post_id as post_id, users.user_id as user_id, users.username as author, posts.post_title as title, comments.comment_content as content, comments.comment_date as date FROM comments
+        INNER JOIN posts ON comments.post_id = posts.post_id
+        INNER JOIN users ON comments.comment_author_id = users.user_id
+        ORDER BY comments.comment_date DESC LIMIT {$this->startFrom}, {$this->perPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $comments = $stmt->fetchAll();
@@ -43,10 +46,10 @@ class Comments extends Connection {
             <tr>
                 <?php foreach ($comment as $key => $value) { ?>
                     <?php if($key == "author") { ?>
-                        <td><p><a href="/cms/author.php?author=<?=$comment["author"]?>"><?=$value?></a></p></td>
+                        <td><p><a href="/cms/author.php?user_id=<?=$comment["user_id"]?>"><?=$value?></a></p></td>
                     <?php } elseif($key == "title") { ?>
                         <td><p><a href="/cms/post.php?post_id=<?=$comment["post_id"]?>"><?=$value?></a></p></td>
-                    <?php } elseif($key !== "post_id") { ?>
+                    <?php } elseif($key !== "post_id" && $key !== "user_id") { ?>
                     <td><?= $value ?></td>
                 <?php }
                 } 
@@ -64,7 +67,7 @@ class Comments extends Connection {
 
     // This method adds new comments
     function insert($post_id, $author, $comment) {
-        $sql = "INSERT INTO comments(post_id, comment_author, comment_content) ";
+        $sql = "INSERT INTO comments(post_id, comment_author_id, comment_content) ";
         $sql .= "VALUES(?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$post_id, $author, $comment]);

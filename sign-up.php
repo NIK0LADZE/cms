@@ -10,11 +10,6 @@ if(isset($_SESSION["auth"])) {
 
         <div class="row">
             <h1>Registration Page</h1>
-            <?php 
-            if(isset($_GET["success"])) {
-                echo "<h3 style='color: green;'>".$_GET['success']."</h3>";
-            }
-            ?>
             <form action="actions/reg.php" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="username">Username</label>

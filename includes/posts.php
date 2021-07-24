@@ -1,9 +1,9 @@
                         <?php foreach ($posts->array as $post) { ?>
                         <h2>
-                            <a href="post.php?post_id=<?=$post["id"]?>"><?=$post["title"]?></a>
+                            <a href="/cms/post.php?post_id=<?=$post["id"]?>"><?=$post["title"]?></a>
                         </h2>
                         <p class="lead">
-                            by <a href="/cms/author.php?author=<?=$post["author"]?>"><?=$post["author"]?></a>
+                            by <a href="/cms/author.php?user_id=<?=$post["user_id"]?>"><?=$post["author"]?></a>
                         </p>
                         <p><span class="glyphicon glyphicon-time"></span> Posted on <?=date("F d, Y \a\\t H:i A", strtotime($post["date"]))?></p>
                         <hr>

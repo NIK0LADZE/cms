@@ -13,6 +13,8 @@ if(isset($_SESSION["auth"])) {
             <?php 
             if(isset($_GET["alert"])) {
                 echo "<h3 style='color: red;'>".$_GET['alert']."</h3>";
+            } elseif(isset($_GET["success"])) {
+                echo "<h3 style='color: green;'>".$_GET['success']."</h3>";
             }
             ?>
             <form action="/cms/actions/auth.php" method="post">

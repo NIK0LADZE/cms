@@ -55,7 +55,7 @@
                                 $categories = $categories->array; 
                                 foreach ($categories as $key => $category) {
                                     if($key % 2 == 0) {
-                                        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
+                                        echo "<li><a href='/cms/category.php?cat_id={$category['id']}'>{$category['title']}</a></li>";
                                     }
                                 }
                                 ?>
@@ -67,7 +67,7 @@
                                 <?php
                                 foreach ($categories as $key => $category) {
                                     if($key % 2 == 1) {
-                                        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
+                                        echo "<li><a href='/cms/category.php?cat_id={$category['id']}'>{$category['title']}</a></li>";
                                     }
                                 }
                                 ?>

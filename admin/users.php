@@ -29,9 +29,9 @@
                         <?php 
                         require_once($_SERVER['DOCUMENT_ROOT']."/cms/database/users.php");
                         $users = new Users();
-                        $users->perPage();
                         $users->setRole();
                         $users->delete();
+                        $users->perPage(1, 8);
                         if(isset($users->startPostsFrom)) { ?>
                             <form action="" method="post">
                                 <table class="table table-bordered table-hover">

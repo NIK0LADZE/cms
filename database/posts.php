@@ -31,7 +31,7 @@ class Posts extends Connection {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $title = $_POST["title"];
                 $category = $_POST["category"];
-                $author = $_SESSION["username"];
+                $author = $_SESSION["id"];
                 $tags = $_POST["tags"];
                 $content = $_POST["content"];
                 
@@ -71,7 +71,7 @@ class Posts extends Connection {
                     if(!isset($image)) {
                         $image = "no-photo.png";
                     }
-                    $sql = "INSERT INTO posts(post_title, post_author, post_category, post_image, post_tags, post_content) ";
+                    $sql = "INSERT INTO posts(post_title, post_author_id, post_category_id, post_image, post_tags, post_content) ";
                     $sql .= "VALUES(?, ?, ?, ?, ?, ?)";
                     $stmt = $this->conn->prepare($sql);
                     $stmt->execute([$title, $author, $category, $image, $tags, $content]);
@@ -126,7 +126,7 @@ class Posts extends Connection {
                 }
 
                 if(!isset($photoError)) {
-                    $query = "UPDATE posts SET post_title=:title, post_category=:category, ";
+                    $query = "UPDATE posts SET post_title=:title, post_category_id=:category, ";
                     if(isset($image)) {
                         $query .= "post_image=:image, ";
                     }
@@ -148,8 +148,9 @@ class Posts extends Connection {
         }
     }
 
+    // This method sends data for editing posts
     function data($id) {
-        $sql = "SELECT post_title as title, post_category as category, post_image as image,
+        $sql = "SELECT post_title as title, post_category_id as category, post_image as image,
         post_tags as tags, post_content as content FROM posts WHERE post_id=?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
@@ -158,23 +159,25 @@ class Posts extends Connection {
 
     // This method displays category options when adding or editing posts
     function options() {
-        $sql = "SELECT cat_title FROM categories";
+        $sql = "SELECT cat_id as id, cat_title as title FROM categories";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $options = $stmt->fetchAll();
         foreach ($options as $option) {
-            if($this->data["category"] == $option["cat_title"]) { ?>
-                <option value="<?=$option["cat_title"];?>" selected><?=$option["cat_title"];?></option>
+            if($this->data["category"] == $option["id"]) { ?>
+                <option value="<?=$option["id"];?>" selected><?=$option["title"];?></option>
             <?php } else { ?>
-            <option value="<?=$option["cat_title"];?>"><?=$option["cat_title"];?></option>
+            <option value="<?=$option["id"];?>"><?=$option["title"];?></option>
         <?php }
         }
     }
 
     /* This method displays posts */
     function display($content = 1) {
-        $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
-        post_image as image, post_views as views, post_content as content, post_date as date FROM posts
+        $sql = "SELECT posts.post_id as id, posts.post_title as title, users.user_id as user_id, users.username as author,
+        posts.post_image as image, posts.post_views as views, posts.post_content as content, posts.post_date as date 
+        FROM posts
+        INNER JOIN users ON posts.post_author_id = users.user_id
         WHERE ";
         // Displays post on post page
         if(isset($_GET["post_id"])) {
@@ -183,11 +186,11 @@ class Posts extends Connection {
             $this->startPostsFrom = 0;
             $this->perPage = 1;
         // Displays posts on selected category page
-        } elseif(isset($_GET["category"])) {
-            $sql .= "post_category=?";
+        } elseif(isset($_GET["cat_id"])) {
+            $sql .= "posts.post_category_id=?";
         // Displays posts on selected user page
-        } elseif(isset($_GET["author"])) {
-            $sql .= "post_author=?";
+        } elseif(isset($_GET["user_id"])) {
+            $sql .= "posts.post_author_id=?";
         // Displays posts on home page
         } else {
             $sql .= "1=?";
@@ -201,9 +204,13 @@ class Posts extends Connection {
 
     // This method displays posts table in admin panel
     function table() {
-        $this->perPage = 8;
-        $sql = "SELECT post_id as id, post_author as author, post_title as title, post_category as category, 
-        post_image as image, post_tags as tags, post_views as views, post_comment_count as comments, post_date as date FROM posts ORDER BY post_date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
+        $sql = "SELECT posts.post_id as id, users.user_id as user_id, users.username as author, posts.post_title as title, categories.cat_id as cat_id, categories.cat_title as category,
+        posts.post_image as image, posts.post_tags as tags, posts.post_views as views, 
+        (SELECT COUNT(comment_id) FROM comments WHERE comments.post_id = id) as comments, posts.post_date as date 
+        FROM posts
+        INNER JOIN users ON posts.post_author_id = users.user_id
+        INNER JOIN categories ON posts.post_category_id = categories.cat_id
+        ORDER BY post_date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         $posts = $stmt->fetchAll();
@@ -213,21 +220,13 @@ class Posts extends Connection {
                 foreach ($post as $key => $value) { 
                     if($key == "image") { ?>
                         <td><p><img style="object-fit: cover;" width="120vw;" height="40vh;" src="/cms/uploads/<?php echo $value;?>" alt="Post image"></p></td>
-                    <?php } elseif($key == "comments") { 
-                        $post_id = $post["id"];
-                        $query = "SELECT COUNT(comment_id) as count FROM comments WHERE post_id='$post_id'";
-                        $commentCount = $this->conn->prepare($query);
-                        $commentCount->execute();
-                        $count = $commentCount->fetch(PDO::FETCH_ASSOC);
-                        ?>
-                        <td><?php echo $count["count"];?></td>
                     <?php } elseif($key == "title") { ?>
                         <td><p><a href="/cms/post.php?post_id=<?=$post["id"]?>"><?=$value?></a></p></td>
                     <?php } elseif($key == "author") { ?>
-                        <td><p><a href="/cms/author.php?author=<?=$post["author"]?>"><?=$value?></a></p></td>
+                        <td><p><a href="/cms/author.php?user_id=<?=$post["user_id"]?>"><?=$value?></a></p></td>
                     <?php } elseif($key == "category") { ?>
-                        <td><p><a href="/cms/category.php?category_title=<?=$post["category"]?>"><?=$value?></a></p></td>
-                    <?php } else { ?>
+                        <td><p><a href="/cms/category.php?cat_id=<?=$post["cat_id"]?>"><?=$value?></a></p></td>
+                    <?php } elseif($key != "user_id" && $key != "cat_id") { ?>
                         <td><p><?php echo $value;?></p></td>
                     <?php }
                 } 
@@ -257,8 +256,8 @@ class Posts extends Connection {
         if(isset($_POST["clone_post"])) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $id = $_POST["post_id"];
-                $sql = "INSERT INTO posts(post_author, post_title, post_category, post_image, post_tags, post_comment_count, post_content) 
-                SELECT post_author, post_title, post_category, post_image, post_tags, post_comment_count, post_content FROM posts WHERE post_id=?";
+                $sql = "INSERT INTO posts(post_author_id, post_title, post_category_id, post_image, post_tags, post_content) 
+                SELECT post_author_id, post_title, post_category_id, post_image, post_tags, post_content FROM posts WHERE post_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
             }
@@ -288,7 +287,7 @@ class Posts extends Connection {
     }
 
     /* This method counts how many posts are on different pages and applies it to pagination */
-    function perPage($content = 1) {
+    function perPage($content = 1, $perPage = 10) {
         $countSQL = "SELECT COUNT(post_id) as count FROM posts WHERE ";
         if(isset($_GET["keyword"])) {
             $countSQL .= "post_tags LIKE ";
@@ -304,11 +303,11 @@ class Posts extends Connection {
                 $countSQL .= "?";
             } 
         // Calculates amount of posts in selected category
-        } elseif(isset($_GET["category"])) {
-            $countSQL .= "post_category=?";
+        } elseif(isset($_GET["cat_id"])) {
+            $countSQL .= "post_category_id=?";
         // Calculates amount of posts by selected user
-        } elseif(isset($_GET["author"])) {
-            $countSQL .= "post_author=?";
+        } elseif(isset($_GET["user_id"])) {
+            $countSQL .= "post_author_id=?";
         // Displays all posts for home page
         } else {
             $countSQL .= "1=?";
@@ -324,7 +323,7 @@ class Posts extends Connection {
         // Calculates diapason of posts which should be shown on each page
         $this->postCount = $stmt->fetch(PDO::FETCH_ASSOC);
         $this->postCount = $this->postCount["count"];
-        $this->pagerCount = ceil($this->postCount / $this->perPage); 
+        $this->pagerCount = ceil($this->postCount / $perPage); 
         if(isset($_GET["page"])) {
             if($_GET["page"] == 1) {
                 $this->page = 1;
@@ -333,7 +332,7 @@ class Posts extends Connection {
                 echo "<h1>This page doesn't exist.</h1>";
             } else {
                 $this->page = $_GET["page"];
-                $this->startPostsFrom = ($this->page - 1) * $this->perPage;
+                $this->startPostsFrom = ($this->page - 1) * $perPage;
             }
         } else {
             $this->page = 1;
@@ -350,8 +349,11 @@ class Posts extends Connection {
             $keywords = explode(" ", $_GET["keyword"]);
             $keywords = "%".implode("% %", $keywords)."%";
             $keywords = explode(" ", $keywords);
-            $sql = "SELECT post_id as id, post_title as title, post_author as author, post_category as category,
-            post_image as image, post_views as views, post_content as content, post_date as date FROM posts WHERE post_tags LIKE ";
+            $sql = "SELECT posts.post_id as id, posts.post_title as title, users.user_id as user_id, users.username as author,
+            posts.post_image as image, posts.post_views as views, posts.post_content as content, posts.post_date as date 
+            FROM posts
+            LEFT JOIN users ON posts.post_author_id = users.user_id
+            WHERE post_tags LIKE ";
             // Checking for each keyword
             for ($i = 0; $i < count($keywords); $i++) {
                 if($i > 0) {
@@ -359,7 +361,7 @@ class Posts extends Connection {
                 }
                 $sql .= "?";
             } 
-            $sql .= " ORDER BY post_date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
+            $sql .= "ORDER BY post_date DESC LIMIT {$this->startPostsFrom}, {$this->perPage}";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute($keywords);
             return $this->array = $stmt->fetchAll();

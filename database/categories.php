@@ -3,6 +3,7 @@ require_once("conn.php");
 
 Class Categories extends Connection {
     /* Properties for Categories */
+    public $title;
     public $array;
 
     /* Opening Database Connection */
@@ -20,10 +21,10 @@ Class Categories extends Connection {
     }
 
     /* This method checks if category really exists */
-    function checkCategory($cat_title) {
-        $sql = "SELECT COUNT(cat_title) as count FROM categories WHERE cat_title=? LIMIT 1";
+    function check($cat_id) {
+        $sql = "SELECT COUNT(cat_id) as count FROM categories WHERE cat_id=? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$cat_title]);
+        $stmt->execute([$cat_id]);
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
         return $count["count"];
     }
@@ -34,7 +35,7 @@ Class Categories extends Connection {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if(!empty($_POST["cat_title"])) {
                     $cat_title = $_POST["cat_title"];
-                    $count = $this->checkCategory($cat_title);
+                    $count = $this->check($cat_title);
                     if($count == 1) {
                         echo "<p style='color: red; margin: 0;'>This category already exists</p>";
                     } else {
@@ -56,16 +57,13 @@ Class Categories extends Connection {
                 $oldCatTitle = $_POST["old"];
                 $newCatTitle = $_POST["new"];
                 if(!empty($newCatTitle)) {
-                    $count = $this->checkCategory($newCatTitle);
+                    $count = $this->check($newCatTitle);
                     if($count == 1) {
                         echo "<p style='color: red; margin: 0;'>This category already exists</p>";
                     } else {
                         $updateCat = "UPDATE categories SET cat_title=? WHERE cat_title=?";
                         $updateCat = $this->conn->prepare($updateCat);
                         $updateCat->execute([$newCatTitle, $oldCatTitle]);
-                        $updatePost = "UPDATE posts SET post_category=? WHERE post_category=?";
-                        $updatePost = $this->conn->prepare($updatePost);
-                        $updatePost->execute([$newCatTitle, $oldCatTitle]);
                     }
                 } else {
                     echo "<p style='text-align: center; color: red; margin: 0;'>New value shoud not be empty</p>";
@@ -82,6 +80,15 @@ Class Categories extends Connection {
         $this->array = $stmt->fetchAll();
     }
 
+    /* This method displays category title */
+    function title($id) {
+        $sql = "SELECT cat_title as title FROM categories WHERE cat_id=?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        $this->title = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->title = $this->title["title"];
+    }
+
     /* This method displays categories table in admin panel */
     function table() {
         $this->display();
@@ -89,7 +96,7 @@ Class Categories extends Connection {
             <tr>
                 <td><p><?php echo $cat['id'];?></p></td>
                 <td id="title">
-                    <p id="<?php echo $cat['title'];?>"><a href="/cms/category.php?category=<?=$cat['title']?>"><?=$cat['title']?></a></p>
+                    <p id="<?php echo $cat['title'];?>"><a href="/cms/category.php?cat_id=<?=$cat['id']?>"><?=$cat['title']?></a></p>
                     <form action="" method="post">
                         <input type="hidden" name="old" value="<?php echo $cat['title'];?>">
                         <input type="hidden" name="new" class="edit" id="<?php echo $cat['title'].'_for_input';?>" value="<?php echo $cat['title'];?>">
@@ -117,7 +124,7 @@ Class Categories extends Connection {
                 $id = $_POST["cat_id"];
                 $sql = "DELETE categories, posts, comments 
                 FROM categories 
-                LEFT JOIN posts ON categories.cat_title=posts.post_category
+                LEFT JOIN posts ON categories.cat_id=posts.post_category_id
                 LEFT JOIN comments ON posts.post_id=comments.post_id
                 WHERE categories.cat_id=?";
                 $stmt = $this->conn->prepare($sql);

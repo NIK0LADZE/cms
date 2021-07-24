@@ -3,11 +3,7 @@ session_start();
 
 if(isset($_POST["addcomment"])) {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if(isset($_SESSION["username"])) {
-            $author = $_SESSION["username"];
-        } else {
-            $author = $_POST["comment_author"];
-        }
+        $author = $_SESSION["id"];
         $comment = $_POST['comment_content'];
         $post_id = $_POST["post_id"];
 

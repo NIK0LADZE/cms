@@ -27,7 +27,7 @@
         
                         <!-- Author -->
                         <p class="lead">
-                            by <a href="/cms/author.php?author=<?=$post["author"]?>"><?=$post["author"]?></a>
+                            by <a href="/cms/author.php?user_id=<?=$post["user_id"]?>"><?=$post["author"]?></a>
                         </p>
         
                         <hr>
@@ -50,25 +50,18 @@
                         <!-- Blog Comments -->
         
                         <!-- Comments Form -->
-                        <div class="well">
-                            <h4>Leave a Comment:</h4>
-                            <form action="actions/addComment.php" method="post">
-                                <?php if(!isset($_SESSION["auth"])) { ?>
+                        <?php if(isset($_SESSION["auth"])) { ?>
+                            <div class="well">
+                                <h4>Leave a Comment:</h4>
+                                <form action="actions/addComment.php" method="post">
                                     <div class="form-group">
-                                        <label for="comment_author">Author</label>
-                                        <input name="comment_author" type="text" class="form-control" required>
+                                        <textarea name="comment_content" style="resize: vertical; min-height: 100px;" class="form-control" rows="3" required></textarea>
                                     </div>
-                                <?php } ?>
-                                <div class="form-group">
-                                    <?php if(!isset($_SESSION["auth"])) { ?>
-                                        <label for="comment_content">Comment</label>
-                                    <?php } ?>
-                                    <textarea name="comment_content" style="resize: vertical; min-height: 100px;" class="form-control" rows="3" required></textarea>
-                                </div>
-                                <input type="hidden" name="post_id" value="<?=$_GET["post_id"]?>">
-                                <button name="addcomment" type="submit" class="btn btn-primary">Submit</button>
-                            </form>
-                        </div>
+                                    <input type="hidden" name="post_id" value="<?=$_GET["post_id"]?>">
+                                    <button name="addcomment" type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                        <?php } ?>
         
                         <hr>
         

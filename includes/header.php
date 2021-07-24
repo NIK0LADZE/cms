@@ -53,7 +53,7 @@
                     $categories->display(); 
                     $categories = $categories->array; 
                     foreach ($categories as $key => $category) {
-                        echo "<li><a href='/cms/category.php?category={$category['title']}'>{$category['title']}</a></li>";
+                        echo "<li><a href='/cms/category.php?cat_id={$category['id']}'>{$category['title']}</a></li>";
                     }
                     if(isset($_SESSION["auth"])) {
                         if($_SESSION["auth"] === "true") { ?>

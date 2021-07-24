@@ -10,6 +10,7 @@ Class Users extends Connection {
     public $userCount;
     public $pagerCount;
     public $page;
+    public $title;
     
     /* Opening Database Connection */
     function __construct() {
@@ -23,8 +24,8 @@ Class Users extends Connection {
                 $id = $_POST["delete_user"];
                 $sql = "DELETE users, posts, comments
                 FROM users
-                LEFT JOIN posts ON users.username=posts.post_author
-                LEFT JOIN comments ON (posts.post_id=comments.post_id AND users.username=comments.comment_author) OR users.username=comments.comment_author
+                LEFT JOIN posts ON users.user_id=posts.post_author_id
+                LEFT JOIN comments ON posts.post_id=comments.post_id OR users.user_id=comments.comment_author_id
                 WHERE user_id=?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$id]);
@@ -80,7 +81,7 @@ Class Users extends Connection {
                             <?php } ?>
                         </td>
                     <?php } elseif($key == "username") { ?>
-                        <td><p><a href="/cms/author.php?author=<?=$user["username"]?>"><?=$value?></a></p></td>
+                        <td><p><a href="/cms/author.php?user_id=<?=$user["id"]?>"><?=$value?></a></p></td>
                     <?php } else { ?>
                         <td><p><?php echo $value;?></p></td>
                     <?php }
@@ -114,16 +115,20 @@ Class Users extends Connection {
                     $_SESSION["lname"] = $user["lname"];
                     $_SESSION["role"] = $user["role"];
                     $_SESSION["auth"] = "true";
-                    header("Location: ".$_SERVER['HTTP_REFERER']);
+                    $link = explode("&alert", $_SERVER['HTTP_REFERER']);
+                    header("Location: ".$link[0]);
                 } else {
                     $error = "Incorrect username or password!";
-                    $link = explode("?alert", $_SERVER['HTTP_REFERER']);
-                    $link = $link[0];
-                    if(count(explode("?", $link)) == 1) {
-                        $link = $link."?alert=$error";
+                    // echo $_SERVER['HTTP_REFERER'];
+                    if(count(explode("?alert", $_SERVER['HTTP_REFERER'])) != 1
+                    || count(explode("?success", $_SERVER['HTTP_REFERER'])) != 1) {
+                        $link = explode("?", $_SERVER['HTTP_REFERER']);
+                        $link = $link[0];
+                    } elseif(count(explode("?", $_SERVER['HTTP_REFERER'])) != 1) {
+                        $link = explode("&alert", $_SERVER['HTTP_REFERER']);
+                        echo $link = $link[0]."&alert=".$error;
                     } else {
-                        $link = explode("&alert", $link);
-                        $link = $link[0]."&alert=$error";
+                        echo $link = $_SERVER['HTTP_REFERER']."?alert=$error";
                     }
                     header("Location: ".$link);
                 }
@@ -243,7 +248,7 @@ Class Users extends Connection {
                     $sql .= "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
                     $stmt = $this->conn->prepare($sql);
                     $stmt->execute([$username, $fname, $lname, $password, $bdate, $email, $image, $role]);
-                    $link = "sign-up.php?success=Registration was successful!";
+                    $link = "sign-in.php?success=Registration was successful!";
                     return header("Location: ../$link");
                 } else {
                     $link = "sign-up.php?".http_build_query($errArr)."&".http_build_query($succArr);
@@ -345,16 +350,6 @@ Class Users extends Connection {
                 }
 
                 if(count($errArr) == 0) {
-                    $currentUsername = $_POST["current-username"];
-                    // Checks if username is changed updates posts and comments with that username
-                    if($currentUsername !== $username) {
-                        $updatePosts = "UPDATE posts SET post_author=? WHERE post_author=?";
-                        $update = $this->conn->prepare($updatePosts);
-                        $update->execute([$username, $currentUsername]);
-                        $updateComments = "UPDATE comments SET comment_author=? WHERE comment_author=?";
-                        $update = $this->conn->prepare($updateComments);
-                        $update->execute([$username, $currentUsername]);
-                    }
                     $sql = "UPDATE users SET fname=:fname, lname=:lname, ";
                     if(isset($username)) {
                         $sql .= "username=:username, ";
@@ -411,12 +406,21 @@ Class Users extends Connection {
     }
 
     /* This method checks if user really exists */
-    function checkUser($username) {
-        $sql = "SELECT COUNT(username) as count FROM users WHERE username=? LIMIT 1";
+    function check($user_id) {
+        $sql = "SELECT COUNT(username) as count FROM users WHERE user_id=? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$username]);
+        $stmt->execute([$user_id]);
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
         return $count["count"];
+    }
+
+    /* This method displays username */
+    function title($id) {
+        $sql = "SELECT username FROM users WHERE user_id=?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        $this->title = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->title = $this->title["username"];
     }
 
     /* This method counts how many users are on each page in admin panel(users section) and applies it to pagination */

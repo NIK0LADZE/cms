@@ -10,32 +10,36 @@
 
                 <!-- Blog Post -->
                 <?php
-                if(isset($_GET["category"])) {
+                if(isset($_GET["cat_id"])) {
                     require_once("database/posts.php");
                     require_once("database/categories.php");
-                    $cat_title = $_GET["category"];
+                    $cat_id = $_GET["cat_id"];
                     $posts = new Posts();
-                    $posts->perPage($cat_title);
-                    $posts->display($cat_title);
+                    $category = new Categories();
+                    $posts->perPage($cat_id);
+                    $posts->display($cat_id);
                     $count = count($posts->array);
                     
                     if($count == 0) {
                         // This object is set to check if category really exists in database
-                        $category = new Categories();
-                        if($category->checkCategory($cat_title) == 0) {
+                        $category->display();
+                        if($category->check($cat_id) == 0) {
                             echo "<h1>This page doesn't exist.</h1>";
                         } else {
                             echo "<h1>No posts yet.</h1>";
                         }
                     } else { ?>
                         <h1 class="page-header">
-                            <?=$cat_title?>
+                            <?php 
+                            $category->title($_GET["cat_id"]);
+                            echo $category->title;
+                            ?>
                         </h1>
                         <?php require_once("includes/posts.php"); ?>
                         <hr>
 
                         <!-- Pagination -->
-                        <?php pager("category.php?category=".$cat_title."&", $posts->page, $posts->pagerCount);?>
+                        <?php pager("category.php?cat_id=".$cat_id."&", $posts->page, $posts->pagerCount);?>
                     <?php } ?>
                 <?php } else {?>
                     <h1>This page doesn't exist.</h1>
