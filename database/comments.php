@@ -25,11 +25,11 @@ class Comments extends Connection {
     }
 
     // This method displays comments for posts
-    function display() {
+    function display($post_id) {
         $sql = "SELECT users.image as photo, users.username as author, comments.comment_content as content, comments.comment_date as date 
         FROM comments INNER JOIN users ON comments.comment_author_id = users.user_id WHERE comments.post_id=? ORDER BY date DESC";
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$_GET["post_id"]]);
+        $stmt->execute([$post_id]);
         $this->array = $stmt->fetchAll();
     }
 
